@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import math
+
 # ode function needed to solve
 def ODE(x,t):
     dx_dt = x
@@ -14,9 +16,52 @@ def euler_step(x_pre, t_pre, ODE, step_size):
     t_new = t_pre + step_size
     return x_new, t_new
 
-def solve_to(x0,t0,ODE, t2,deltat_max, tol):
+def do_step(x0,t0,step_size,ODE,n,extra_step):
     x_array = []
     t_array = []
+    x_sol = []
+    t= t0
+    x=x0
+    x_n = np.zeros(n + 2)
+    t_n = np.zeros(n + 2)
+    x_n[0] = x0
+    t_n[0] = t0
+    i_count = 0
+    for i in range(n):
+        print(step_size)
+        x_new, t_new = euler_step(x, t, ODE, step_size)
+        x = x_new
+        t = t_new
+        x_n[i+1] = x
+        t_n[i+1] = t
+        i_count += 1
+    x_extra, t_extra = euler_step(x, t, ODE, extra_step)
+    x_n[i_count+1] = x_extra
+    t_n[i_count+1] = t_extra
+
+    x_sol.append(x_extra)
+    x_array.append(x_n)
+    t_array.append(t_n)
+    return x_sol,x_array,t_array
+
+def driver(t0,t1,step_size,ODE):
+    gap = t1-t0
+    n_array = []
+    if step_size % gap == 0:
+        n = gap/step_size
+        extra_step = 0
+        x_sol,x_array,t_array = do_step(x0,t0,step_size,ODE,n,extra_step)
+    else:
+        n = (gap/step_size).astype(int)
+        extra_step = gap - n*step_size
+        x_sol,x_array,t_array = do_step(x0,t0,step_size,ODE,n,extra_step)
+    return x_sol,x_array,t_array
+
+
+def solve_to(x0,t0,ODE, t2,deltat_max, tol):
+    idxs_array = []
+    x_array_of_arrays = []
+    t_array_of_arrays = []
 
     # analytical solution
     x_a = np.arange(0, 1, 0.01)
@@ -24,44 +69,25 @@ def solve_to(x0,t0,ODE, t2,deltat_max, tol):
     for i in range(len(x_a)):
         y_a[i] = sol_x(x_a[i])
 
-    x_sol = []
-    #
-    # NEED TO WORK OUT WHAT TO DO WITH N
-    #
-
-    # Creates stepsizes and deletes the ones == 0 or greater than deltalt_max
+    # Creates step_sizes and deletes the ones == 0 or greater than deltalt_max
     n = 11
     step_sizes =  np.linspace(t0,t2,n)
-    idxs_array = []
+    print(step_sizes)
     for j in range(len(step_sizes)):
-        print(step_sizes[j],np.float64(t2),np.float64(t2)  %  step_sizes[j])
-        if step_sizes[j] > np.float64(deltat_max) or step_sizes[j] == np.float64(0) or np.float64(t2) % step_sizes[j] != 0:
-            # remove stepsize
+        if step_sizes[j] > np.float64(deltat_max) or step_sizes[j] == np.float64(0):
+            # remove stepsize or dont use stepsize
             idx = np.where(step_sizes==step_sizes[j])
             idxs_array.append(idx)
+        else:
+            x_sol,xs_array,ts_array = driver(t0,t2,step_sizes[j],ODE)
+
+            x_array_of_arrays.append(xs_array)
+            t_array_of_arrays.append(ts_array)
+
     step_sizes = np.delete(step_sizes, idxs_array)
-    print(step_sizes)
-
     # calculates and store all values of x and t for each different euler step
-    for j in range(len(step_sizes)):
-        t= t0
-        x=x0
-        x_n = np.zeros(n + 1)
-        t_n = np.zeros(n + 1)
-        x_n[0] = x0
-        t_n[0] = t0
-        for i in range(n):
-            x_new, t_new = euler_step(x, t, ODE, step_sizes[j])
-            x = x_new
-            t = t_new
-            x_n[i+1] = x
-            t_n[i+1] = t
 
-        x_sol.append(x)
-        x_array.append(x_n)
-        t_array.append(t_n)
-
-    return x_array,t_array
+    return x_array_of_arrays,t_array_of_arrays, step_sizes
 
 def analytical_sol(t0,t1, step_sizes, sol_x):
     t_a = np.arange(t0, t1, step_sizes)
@@ -71,29 +97,24 @@ def analytical_sol(t0,t1, step_sizes, sol_x):
         x_a[i] = sol_x(t_a[i])
     return t_a,x_a
 
-
-
-
 #sol = odeint(ODE, x0, delta_t, args=(x,t)
 
 x0 = 1
 t0 = 0
 t2 = 1 # Final Value
 tol =1
-deltat_max = 0.2
-x_array,t_array = solve_to(x0,t0,ODE, t2,deltat_max,tol)
+deltat_max = 0.5
+x_arrays,t_arrays, step_sizes = solve_to(x0,t0,ODE, t2,deltat_max,tol)
 
+print("here",x_arrays)
 #step_sizes =  np.linspace(0,1,101) # stepsize
-
-
 
 t_a, x_a = analytical_sol(t0,t2, 0.01, sol_x)
 print(max(t_a))
-print(max(t_array[2]))
-
+print(t_arrays[2][0])
 plt.plot(t_a, x_a, label="analytical")
-plt.plot(t_array[0], x_array[0], label="analytical")
-plt.plot(t_array[2], x_array[2], label="analytical")
+plt.plot(t_arrays[0][0], x_arrays[0][0], label="analytical")
+plt.plot(t_arrays[2][0], x_arrays[2][0], label="analytical")
 plt.show()
 
 
