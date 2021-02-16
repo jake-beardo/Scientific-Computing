@@ -62,6 +62,7 @@ def solve_to(x0,t0,ODE, t2,deltat_max, tol):
     idxs_array = []
     x_array_of_arrays = []
     t_array_of_arrays = []
+    x_sol_array = []
 
     # analytical solution
     x_a = np.arange(0, 1, 0.01)
@@ -70,7 +71,7 @@ def solve_to(x0,t0,ODE, t2,deltat_max, tol):
         y_a[i] = sol_x(x_a[i])
 
     # Creates step_sizes and deletes the ones == 0 or greater than deltalt_max
-    n = 11
+    n = 20001
     step_sizes =  np.linspace(t0,t2,n)
     print(step_sizes)
     for j in range(len(step_sizes)):
@@ -83,11 +84,12 @@ def solve_to(x0,t0,ODE, t2,deltat_max, tol):
 
             x_array_of_arrays.append(xs_array)
             t_array_of_arrays.append(ts_array)
+            x_sol_array.append(x_sol)
 
     step_sizes = np.delete(step_sizes, idxs_array)
     # calculates and store all values of x and t for each different euler step
 
-    return x_array_of_arrays,t_array_of_arrays, step_sizes
+    return x_array_of_arrays,t_array_of_arrays, step_sizes,x_sol_array
 
 def analytical_sol(t0,t1, step_sizes, sol_x):
     t_a = np.arange(t0, t1, step_sizes)
@@ -104,7 +106,7 @@ t0 = 0
 t2 = 1 # Final Value
 tol =1
 deltat_max = 0.5
-x_arrays,t_arrays, step_sizes = solve_to(x0,t0,ODE, t2,deltat_max,tol)
+x_arrays,t_arrays, step_sizes,x_sol_array = solve_to(x0,t0,ODE, t2,deltat_max,tol)
 
 print("here",x_arrays)
 #step_sizes =  np.linspace(0,1,101) # stepsize
@@ -112,10 +114,24 @@ print("here",x_arrays)
 t_a, x_a = analytical_sol(t0,t2, 0.01, sol_x)
 print(max(t_a))
 print(t_arrays[2][0])
-plt.plot(t_a, x_a, label="analytical")
-plt.plot(t_arrays[0][0], x_arrays[0][0], label="analytical")
-plt.plot(t_arrays[2][0], x_arrays[2][0], label="analytical")
+err = [sol_x(1) - i for i in x_sol_array]
+print("err",err)
+
+
+plt.loglog(step_sizes, err)
+plt.ylabel("Error")
+plt.xlabel("Step Size")
+plt.title("Error in approximation compared to stepsize")
 plt.show()
+for i in range(len(x_arrays)):
+    plt.plot(t_arrays[i][0], x_arrays[i][0], label="approximation")
+
+plt.plot(t_a, x_a, label="analytical")
+plt.legend()
+plt.xlabel("t")
+plt.ylabel("x(t)")
+plt.title("euler method approximation")
+#plt.show()
 
 
 
