@@ -22,13 +22,12 @@ def do_step(x0,t0,step_size,ODE,n,extra_step):
     x_sol = []
     t= t0
     x=x0
-    x_n = np.zeros(n + 2)
-    t_n = np.zeros(n + 2)
+    x_n = np.zeros(0,n + 2)
+    t_n = np.zeros(0,n + 2)
     x_n[0] = x0
     t_n[0] = t0
     i_count = 0
     for i in range(n):
-        print(step_size)
         x_new, t_new = euler_step(x, t, ODE, step_size)
         x = x_new
         t = t_new
@@ -44,7 +43,7 @@ def do_step(x0,t0,step_size,ODE,n,extra_step):
     t_array.append(t_n)
     return x_sol,x_array,t_array
 
-def driver(t0,t1,step_size,ODE):
+def driver(x0,t0,t1,step_size,ODE):
     gap = t1-t0
     n_array = []
     if step_size % gap == 0:
@@ -71,16 +70,17 @@ def solve_to(x0,t0,ODE, t2,deltat_max, tol):
         y_a[i] = sol_x(x_a[i])
 
     # Creates step_sizes and deletes the ones == 0 or greater than deltalt_max
-    n = 20001
+    n = 21
     step_sizes =  np.linspace(t0,t2,n)
-    print(step_sizes)
+    print("step",step_sizes)
     for j in range(len(step_sizes)):
+
         if step_sizes[j] > np.float64(deltat_max) or step_sizes[j] == np.float64(0):
             # remove stepsize or dont use stepsize
             idx = np.where(step_sizes==step_sizes[j])
             idxs_array.append(idx)
         else:
-            x_sol,xs_array,ts_array = driver(t0,t2,step_sizes[j],ODE)
+            x_sol,xs_array,ts_array = driver(x0,t0,t2,step_sizes[j],ODE)
 
             x_array_of_arrays.append(xs_array)
             t_array_of_arrays.append(ts_array)
@@ -93,22 +93,45 @@ def solve_to(x0,t0,ODE, t2,deltat_max, tol):
 
 def analytical_sol(t0,t1, step_sizes, sol_x):
     t_a = np.arange(t0, t1, step_sizes)
-    print(t_a)
     x_a = np.zeros(len(t_a))
     for i in range(len(t_a)):
         x_a[i] = sol_x(t_a[i])
     return t_a,x_a
 
+# n is the number of x's wanted between x0 and target solution
+def solve_ode(x0,t0,tt, n, ODE,deltat_max, rk_e):
+    tol = 1
+    t_vals = np.zeros(n)
+    x_vals = np.zeros(n)
+    x_sols = np.zeros(n)
+    t_vals[0] = t0
+    x_vals[0] = x0
+    x_sols[0] = x0
+    steps = int((tt-t0)/n)
+    t2 = t0 + steps
+    t_vals[1] = t2
+
+    for i in range(len(t_vals)):
+        print(i)
+        x_arrays,t_arrays, step_sizes,x_sol_array = solve_to(x_vals[i],t_vals[i],ODE, t_vals[i+1],deltat_max,tol)
+        print(x_arrays)
+        x0 = x_arrays[0][-1][-1]
+
+        t0 = t_arrays[0][-1][-1]
+        print("herlllp",t0)
+        t2 += steps
+        t_vals[i+1] = t0
+        x_vals[i+1] = x0
+        x_sols[i+1] = x0
+
+    return x_vals, t_vals, x_sols
+
+
 #sol = odeint(ODE, x0, delta_t, args=(x,t)
 
-x0 = 1
-t0 = 0
-t2 = 1 # Final Value
-tol =1
-deltat_max = 0.5
-x_arrays,t_arrays, step_sizes,x_sol_array = solve_to(x0,t0,ODE, t2,deltat_max,tol)
+# (x0,t0,tt, n, ODE,deltat_max, rk_e) use sys to run
+print("hello world", solve_ode(1,0,5, 4, ODE,0.5, "runge"))
 
-print("here",x_arrays)
 #step_sizes =  np.linspace(0,1,101) # stepsize
 
 t_a, x_a = analytical_sol(t0,t2, 0.01, sol_x)
