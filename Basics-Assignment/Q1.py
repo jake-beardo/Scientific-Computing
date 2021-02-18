@@ -20,22 +20,12 @@ def euler_step(x_pre, t_pre, ODE, step_size):
 
 # N can be outside function make function so its just one step
 def rk4(x_pre, t_pre, ODE, step_size):
-    N = 1
-    t = t_pre + np.arange(N+1)*step_size
-    x = np.zeros((N+1, np.size(x_pre)))
-    x[0] = x_pre
-    for n in range(N):
-        # only need the following for each step
-        xi1 = x[n]
-        f1 = ODE(xi1,t[n])
-        xi2 = x[n] + (step_size/2.)*f1
-        f2 = ODE(xi2,t[n+1])
-        xi3 = x[n] + (step_size/2.)*f2
-        f3 = ODE(xi3,t[n+1])
-        xi4 = x[n] + step_size*f3
-        f4 = ODE(xi4,t[n+1])
-        x[n+1] = x[n] + (step_size/6.)*(f1 + 2*f2 + 2*f3 + f4)
-    x_new = x[1]
+    k1 = step_size*ODE(x_pre,t_pre)
+    k2 = step_size*ODE(x_pre+(k1/2),t_pre+(step_size/2))
+    k3 = step_size*ODE(x_pre+(k2/2),t_pre+(step_size/2))
+    k4 = step_size*ODE(x_pre+(k3),t_pre+(step_size))
+    k = (1/6)*(k1 + 2*k2 + 2*k3 + k4)
+    x_new = x_pre + k
     return x_new
 
 
@@ -84,7 +74,6 @@ def driver(x0,t0,t1,step_size,ODE,rk_e):
         x_sol = do_step(x0,t0,step_size,ODE,n,extra_step,rk_e)
     else:
         n = (gap/step_size).astype(int)
-        print(n,gap,step_size)
         extra_step = gap - n*step_size
         x_sol = do_step(x0,t0,step_size,ODE,n,extra_step,rk_e)
     return x_sol
@@ -132,14 +121,13 @@ def solve_ode(x0,t0,tt, n, ODE,deltat_max,step_size, rk_e):
         i += 1
 
     t_vals = t_vals[:-1]
-    print("this is the one", t_vals, x_sols)
     return t_vals, x_sols
 
-def error_finder(x_sols,t_vals,sol_x):
+def error_finder(x_sols_array,t_vals_array,sol_x):
     first_counter = 0
     error_arrays = []
     for sols in x_sols_array:
-        err = sol_x(t_vals_array[first_counter][-1]) - sols[-1]
+        err = abs(sol_x(t_vals_array[first_counter][-1]) - sols[-1])
         error_arrays.append(err)
         first_counter += 1
     return error_arrays
@@ -152,8 +140,9 @@ x0 = 1
 n = 4
 deltat_max = 0.5
 
-ns = 2001
-step_sizes =  np.linspace(t0,(t0 + int((tt-t0)/n)),ns)
+ns = 20001
+step_sizes =  np.linspace(t0,(t0 + int((tt-t0)/n)),num=50, base=10)
+print(step_sizes)
 
 idxs_array = []
 t_vals_array = []
@@ -167,7 +156,6 @@ for j in range(len(step_sizes)):
     else:
         # (x0,t0,tt, n, ODE,deltat_max, rk_e) use sys to run
 
-        print(step_sizes[j])
         t_vals_runge, x_sols_runge = solve_ode(x0,t0,tt, n, ODE,deltat_max,step_sizes[j],"--runge")
         t_vals, x_sols = solve_ode(x0,t0,tt, n, ODE,deltat_max,step_sizes[j],"--euler")
         t_vals_array.append(t_vals)
@@ -180,14 +168,24 @@ step_sizes = np.delete(step_sizes, idxs_array)
 
 
 
-errs = error_finder(x_sols,t_vals,sol_x)
-errs_runge = error_finder(x_sols_runge,t_vals_runge,sol_x)
-
-plt.loglog(step_sizes, errs)
-plt.loglog(step_sizes, errs_runge)
+errs = error_finder(x_sols_array,t_vals_array,sol_x)
+errs_runge = error_finder(x_sols_array_runge,t_vals_array,sol_x)
+print(errs_runge)
+plt.loglog(step_sizes, errs, label="euler")
+plt.loglog(step_sizes, errs_runge, label="runge")
 plt.ylabel("Error")
 plt.xlabel("Step Size")
 plt.title("Error in approximation compared to stepsize")
+plt.legend()
+plt.show()
+
+plt.plot(t_vals_array[1], x_sols_array[1], label="euler")
+plt.plot(t_vals_array[1], x_sols_array_runge[1], label="runge")
+plt.legend()
+plt.xlabel("t")
+plt.ylabel("x(t)")
+plt.title("euler method approximation")
+plt.legend()
 plt.show()
 for i in range(len(x_sols_array)):
     plt.plot(t_vals_array[i], x_sols_array[i], label="approximation")
@@ -197,4 +195,3 @@ plt.legend()
 plt.xlabel("t")
 plt.ylabel("x(t)")
 plt.title("euler method approximation")
-plt.show()
