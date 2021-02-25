@@ -141,8 +141,11 @@ n = 4
 deltat_max = 0.5
 
 ns = 20001
-step_sizes =  np.linspace(t0,(t0 + int((tt-t0)/n)),num=50, base=10)
+
+step_sizes =  np.logspace(-5,(t0 + int((tt-t0)/n)),8)
 print(step_sizes)
+#step_sizes = [10^(n-1) for n in range(0,8)]
+
 
 idxs_array = []
 t_vals_array = []
