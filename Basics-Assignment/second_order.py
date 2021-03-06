@@ -136,9 +136,9 @@ x0 = 1
 y0 = 1
 inits = [x0,y0]
 n = tt - 1
-deltat_max = 0.5
+deltat_max = 0.2
 
-step_sizes =  np.logspace(-3,(t0 + int((tt-t0)/n)),8)
+step_sizes =  np.linspace(0,(t0 + int((tt-t0)/n)),15)
 print(step_sizes)
 ODE = x_dot, y_dot
 
@@ -179,13 +179,13 @@ plt.title("euler method approximation")
 plt.legend()
 plt.show()
 for i in range(len(x_sols_array)):
-    plt.plot(t_vals_array[i], x_sols_array[i], label="approximation")
-    plt.plot(t_vals_array[i], x_sols_array_runge[i], label="approximation")
+    plt.plot(t_vals_array[i], x_sols_array[i], label="Euler approx")
+    plt.plot(t_vals_array[i], x_sols_array_runge[i], label="RK4 approx")
 
 plt.legend()
 plt.xlabel("t")
 plt.ylabel("x(t)")
-plt.title("euler method approximation")
+plt.show()
 errs = error_finder(x_sols_array,t_vals_array,sol_x)
 errs_runge = error_finder(x_sols_array_runge,t_vals_array,sol_x)
 print(errs_runge)

@@ -165,14 +165,14 @@ step_sizes = np.delete(step_sizes, idxs_array)
 
 
 for i in range(len(t_vals_array)):
-    plt.plot(t_vals_array[i], x_sols_array[i], label="euler")
-    plt.plot(t_vals_array[i], x_sols_array_runge[i], label="runge")
+    plt.plot(t_vals_array[i], x_sols_array[i], label="Euler approx")
+    plt.plot(t_vals_array[i], x_sols_array_runge[i], label="RK4 approx")
 
 
 plt.legend()
 plt.xlabel("t")
 plt.ylabel("x(t)")
-plt.title("euler method approximation")
+plt.title("Euler method approximation")
 plt.legend()
 plt.show()
 for i in range(len(x_sols_array)):
@@ -182,7 +182,8 @@ for i in range(len(x_sols_array)):
 plt.legend()
 plt.xlabel("t")
 plt.ylabel("x(t)")
-plt.title("euler method approximation")
+plt.title("Euler method approximation")
+plt.show()
 errs = error_finder(x_sols_array,t_vals_array,sol_x)
 errs_runge = error_finder(x_sols_array_runge,t_vals_array,sol_x)
 print(errs_runge)

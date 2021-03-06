@@ -142,7 +142,7 @@ deltat_max = 0.5
 
 ns = 20001
 
-step_sizes =  np.logspace(-5,(t0 + int((tt-t0)/n)),8)
+step_sizes =  np.logspace(0,(t0 + int((tt-t0)/n)),8)
 print(step_sizes)
 #step_sizes = [10^(n-1) for n in range(0,8)]
 
@@ -174,16 +174,16 @@ step_sizes = np.delete(step_sizes, idxs_array)
 errs = error_finder(x_sols_array,t_vals_array,sol_x)
 errs_runge = error_finder(x_sols_array_runge,t_vals_array,sol_x)
 print(errs_runge)
-plt.loglog(step_sizes, errs, label="euler")
-plt.loglog(step_sizes, errs_runge, label="runge")
+plt.loglog(step_sizes, errs, label="Euler error")
+plt.loglog(step_sizes, errs_runge, label="RK4 error")
 plt.ylabel("Error")
 plt.xlabel("Step Size")
 plt.title("Error in approximation compared to stepsize")
 plt.legend()
 plt.show()
 
-plt.plot(t_vals_array[1], x_sols_array[1], label="euler")
-plt.plot(t_vals_array[1], x_sols_array_runge[1], label="runge")
+plt.plot(t_vals_array[1], x_sols_array[1], label="Euler approx")
+plt.plot(t_vals_array[1], x_sols_array_runge[1], label="RK4 approx")
 plt.legend()
 plt.xlabel("t")
 plt.ylabel("x(t)")
@@ -191,10 +191,11 @@ plt.title("euler method approximation")
 plt.legend()
 plt.show()
 for i in range(len(x_sols_array)):
-    plt.plot(t_vals_array[i], x_sols_array[i], label="approximation")
-    plt.plot(t_vals_array[i], x_sols_array_runge[i], label="approximation")
+    plt.plot(t_vals_array[i], x_sols_array[i], label="Euler approx")
+    plt.plot(t_vals_array[i], x_sols_array_runge[i], label="RK4 approx")
 
 plt.legend()
 plt.xlabel("t")
 plt.ylabel("x(t)")
-plt.title("euler method approximation")
+plt.title("Euler method approximation")
+plt.show()
