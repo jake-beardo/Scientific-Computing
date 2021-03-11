@@ -130,7 +130,8 @@ def main(t0,tt,x0,y0,ODE,n, deltat_max, step_sizes,**kwargs):
     plt.ylabel("x(t)")
     plt.title("euler method approximation")
     plt.legend()
-    plt.show()
+    #plt.show()
+    '''
     for i in range(len(x_sols_array)):
         plt.plot(t_vals_array[i], x_sols_array[i], label="approximation")
         plt.plot(t_vals_array[i], x_sols_array_runge[i], label="approximation")
@@ -147,3 +148,4 @@ def main(t0,tt,x0,y0,ODE,n, deltat_max, step_sizes,**kwargs):
     plt.xlabel("Step Size")
     plt.title("Error in approximation compared to stepsize")
     plt.legend()
+    '''
