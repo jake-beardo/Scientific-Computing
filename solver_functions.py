@@ -118,20 +118,30 @@ def main(t0,tt,x0,y0,ODE,n, deltat_max, step_sizes,**kwargs):
     step_sizes = np.delete(step_sizes, idxs_array)
     #step_sizes =  np.linspace(0,1,101) # stepsize
 
+
+    # PLOT orbit (use for loop with x0s and y0s)
+    #plt.plot(x_sols_array_runge[0], y_sols_array_runge[0], label="runge")
+
+    # PLOT
+    return x_sols_array_runge[0][-1]
+
+    '''
     for i in range(len(t_vals_array)):
+
         plt.plot(t_vals_array[i], x_sols_array[i], label="euler")
         plt.plot(t_vals_array[i], x_sols_array_runge[i], label="runge")
         plt.plot(t_vals_array[i], y_sols_array[i], label="euler")
         plt.plot(t_vals_array[i], y_sols_array_runge[i], label="runge")
 
 
+
     plt.legend()
     plt.xlabel("t")
-    plt.ylabel("x(t)")
-    plt.title("euler method approximation")
+    plt.ylabel("x(t),y(t)")
+    plt.title("approximations")
     plt.legend()
-    #plt.show()
-    '''
+    plt.show()
+
     for i in range(len(x_sols_array)):
         plt.plot(t_vals_array[i], x_sols_array[i], label="approximation")
         plt.plot(t_vals_array[i], x_sols_array_runge[i], label="approximation")
