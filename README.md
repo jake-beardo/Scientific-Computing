@@ -15,3 +15,16 @@ I then altered my code so that it could handle second order ODE's by changing th
 
 ![Second Order approximation](Basics-Assignment/approx_second_order.png)
 Format: ![Alt Text](url)
+
+
+**ODE problems without initial conditions**
+The Lokta-Volterra equation is a predator prey equation where the red line in the graph below shows the predator and the orange the prey. The equation shows oscillations in the size of the population overtime.
+
+
+![Lokta-Volterra (b=0.26)](Basics-Assignment/approx_second_order.png)
+Format: ![Alt Text](url)
+
+
+When b < 0.26 the population will decline very slowly overtime due to either the mortality rate being low or birth rate being high.
+
+Whereas, when b > 0.26 the population will decrease at a much quicker rate as mortality rate may be very high or birth rate may be very low.
