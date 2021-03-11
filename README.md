@@ -28,3 +28,10 @@ Format: ![Alt Text](url)
 When b < 0.26 the population will decline very slowly overtime due to either the mortality rate being low or birth rate being high.
 
 Whereas, when b > 0.26 the population will decrease at a much quicker rate as mortality rate may be very high or birth rate may be very low.
+
+Also, when we plot a birification diagram/phase portrait we witness a spiral when b > 0.26 and a blob when b < 0.26. No matter what initial conditions we use we will also end up with either of these two circumstances. This is shown below:
+
+![Phase Portrait for varying x0 and y0](Basics-Assignment/approx_second_order.png)
+Format: ![Alt Text](url)
+
+We can also plot the last values for predator and prey against different values of b as shown below. This plot shows us that b < 0.26 is unstable and beyond that the population becomes stable. 
