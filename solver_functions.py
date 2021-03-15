@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+from scipy.optimize import fsolve
 import math
 import sys
 
@@ -90,6 +92,21 @@ def error_finder(x_sols_array,t_vals_array,sol_x):
         first_counter += 1
     return error_arrays
 
+def objective(v0):
+    sol = solve_ivp(F, [0, 5], \
+            [y0, v0], t_eval = t_eval)
+    y = sol.y[0]
+    return y[-1] - 50
+
+def shooitng():
+    tol = 0.1
+    while err >= tol:
+        # solve_ivp(ODE, y0 bounds, [min y0 , x_guess], range of values of t)
+        x_guess = solve_ivp(ODE, [0, 5], [y0, x_guess], t_eval = t_eval)
+
+    x0, = fsolve(objective, 10)
+    return x0
+# https://pythonnumericalmethods.berkeley.edu/notebooks/chapter23.02-The-Shooting-Method.html
 
 #sol = odeint(ODE, x0, delta_t, args=(x,t)
 
@@ -123,9 +140,9 @@ def main(t0,tt,x0,y0,ODE,n, deltat_max, step_sizes,**kwargs):
     #plt.plot(x_sols_array_runge[0], y_sols_array_runge[0], label="runge")
 
     # PLOT
-    return x_sols_array_runge[0][-1]
 
-    '''
+
+
     for i in range(len(t_vals_array)):
 
         plt.plot(t_vals_array[i], x_sols_array[i], label="euler")
@@ -141,6 +158,8 @@ def main(t0,tt,x0,y0,ODE,n, deltat_max, step_sizes,**kwargs):
     plt.title("approximations")
     plt.legend()
     plt.show()
+    return x_sols_array_runge[0][-1]
+    '''
 
     for i in range(len(x_sols_array)):
         plt.plot(t_vals_array[i], x_sols_array[i], label="approximation")
