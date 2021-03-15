@@ -7,12 +7,9 @@ import sys
 
 # ode function needed to solve
 
-<<<<<<< Updated upstream
-=======
 '''
 The following two functions help solve analytically
 '''
->>>>>>> Stashed changes
 def sol_x(t):
     solution_x = np.exp(t)
     return solution_x
@@ -24,23 +21,16 @@ def analytical_sol(t0,t1, step_sizes, sol_x):
         x_a[i] = sol_x(t_a[i])
     return t_a,x_a
 
-<<<<<<< Updated upstream
-=======
 '''
 Function to compute each euler steps
 '''
->>>>>>> Stashed changes
 def euler_step(vars, t_pre, ODE, step_size,**kwargs):
     vars = vars + step_size * ODE(vars,t_pre,**kwargs)
     return vars
 
-<<<<<<< Updated upstream
-
-=======
 '''
 Finds each RK4 step for the system of ODEs
 '''
->>>>>>> Stashed changes
 # N can be outside function make function so its just one step
 def rk4(vars, t_pre, ODE, step_size,**kwargs):
     k1 = step_size*ODE(vars,t_pre,**kwargs)
@@ -51,13 +41,9 @@ def rk4(vars, t_pre, ODE, step_size,**kwargs):
     vars = vars + k
     return vars
 
-<<<<<<< Updated upstream
-
-=======
 '''
 do_step does each step and decides whether it needs to do euler or RK4
 '''
->>>>>>> Stashed changes
 def do_step(vars,t0,step_size,ODE,n,extra_step,rk_e,**kwargs):
     # returns x_arrays which is the xs between each step
     t = t0
@@ -76,15 +62,11 @@ def do_step(vars,t0,step_size,ODE,n,extra_step,rk_e,**kwargs):
         vars = rk4(vars, t, ODE, extra_step,**kwargs)
     return vars
 
-<<<<<<< Updated upstream
-
-=======
 '''
 solve to is the driver function that will ensure each step is filled between
 two points. if there is extra space at the end of a step it will compute the
 extra step size needed to make the full distance between the two points
 '''
->>>>>>> Stashed changes
 def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
     gap = t2-t0
     if step_size % gap == 0:
@@ -97,14 +79,11 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
         vars = do_step(vars,t0,step_size,ODE,n,extra_step,rk_e,**kwargs)
     return vars
 
-<<<<<<< Updated upstream
-=======
 '''
 solve_ode runs a for loop that stores all solutions between the target value
 and the initial value.
 it then returns an array of independant and dependant variables and solutions
 '''
->>>>>>> Stashed changes
 # n is the number of x's wanted between x0 and target solution
 def solve_ode(inits,t0,tt, n, ODE,step_size, rk_e, **kwargs):
     x_sols = [inits[0]]
@@ -123,14 +102,11 @@ def solve_ode(inits,t0,tt, n, ODE,step_size, rk_e, **kwargs):
         t_vals.append(t0)
     return t_vals,x_sols,y_sols
 
-<<<<<<< Updated upstream
-=======
 '''
 error finder computes the error in approximation using the difference between
 analytical and approximated solutions
 '''
 
->>>>>>> Stashed changes
 def error_finder(x_sols_array,t_vals_array,sol_x):
     first_counter = 0
     error_arrays = []
@@ -183,46 +159,25 @@ def main(t0,tt,x0,y0,ODE,n, deltat_max, step_sizes,**kwargs):
     step_sizes = np.delete(step_sizes, idxs_array)
     #step_sizes =  np.linspace(0,1,101) # stepsize
 
-<<<<<<< Updated upstream
 
-    # PLOT orbit (use for loop with x0s and y0s)
-    #plt.plot(x_sols_array_runge[0], y_sols_array_runge[0], label="runge")
-
-    # PLOT
-
-
-=======
+    max_y = max(x_sols_array_runge[0])  # Find the maximum y value
+    max_x = t_vals_array[0][x_sols_array_runge[0].index(max_y)]
+    plt.plot(t_vals_array[0], x_sols_array_runge[0], label="runge")
+    plt.plot(t_vals_array[0], y_sols_array_runge[0], label="runge")
+    #plt.plot(max_x, max_y, 'o')
+    plt.legend()
+    plt.xlabel("t")
+    plt.ylabel("x(t),y(t)")
+    plt.show()
     return x_sols_array_runge[0], y_sols_array_runge[0]
-    # PLOT orbit (use for loop with x0s and y0s)
 
-
-
-'''
->>>>>>> Stashed changes
+    '''
 
     for i in range(len(t_vals_array)):
-
         plt.plot(t_vals_array[i], x_sols_array[i], label="euler")
         plt.plot(t_vals_array[i], x_sols_array_runge[i], label="runge")
         plt.plot(t_vals_array[i], y_sols_array[i], label="euler")
         plt.plot(t_vals_array[i], y_sols_array_runge[i], label="runge")
-
-
-
-<<<<<<< Updated upstream
-    plt.legend()
-    plt.xlabel("t")
-    plt.ylabel("x(t),y(t)")
-    plt.title("approximations")
-    plt.legend()
-    plt.show()
-    return x_sols_array_runge[0][-1]
-    '''
-=======
-
-
-
->>>>>>> Stashed changes
 
     for i in range(len(x_sols_array)):
         plt.plot(t_vals_array[i], x_sols_array[i], label="approximation")
