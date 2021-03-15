@@ -14,7 +14,6 @@ Format: ![Alt Text](url)
 I then altered my code so that it could handle second order ODE's by changing the use of the ODE parameter in my functions so that they could handle a list of two ODE's. The way this is done is by manually splitting my second order ODE into two first order ODEs. These can then be used simultaneously within my solve_to function that calculates the Euler or RK4 approximation at each step. The plot below shows the Euler and RK4 approximation of \ddot{x} = - x. Which is equivalent to \dot{x} = y and \dot{y} = -x.
 
 ![Second Order approximation](Graphs/approx_second_order.png)
-Format: ![Alt Text](url)
 
 
 **ODE problems without initial conditions**
