@@ -95,6 +95,7 @@ def solve_ode(inits,t0,tt, n, ODE,step_size, rk_e, **kwargs):
     t2 = t0 + steps
     for i in range(n+1):
         vars = solve_to(vars, t0, ODE, t2, step_size, rk_e, **kwargs)
+        # MIGHT WANT TO CHANGE THIS SO IT JUST ACCEPTS ONE VALUE OF VARS
         x_sols.append(vars[0])
         y_sols.append(vars[1])
         t0 = t2
