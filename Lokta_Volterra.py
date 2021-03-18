@@ -1,7 +1,7 @@
 import numpy as np
 from solver_functions import *
 
-def lokta(vars,t,a,b,d):
+def lokta(vars,t,a=1,b=0.26,d=0.1):
     return np.array([vars[0]*(1-vars[0]) - (a*vars[0]*vars[1])/(d+vars[0]), b*vars[1]*(1 - (vars[1]/vars[0]))])
 
 # for the shooting function we need to have a target eg y0  = 2pi
