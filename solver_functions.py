@@ -5,27 +5,11 @@ from scipy.optimize import fsolve
 import math
 import sys
 
-# ode function needed to solve
-
-'''
-The following two functions help solve analytically
-'''
-def sol_x(t):
-    solution_x = np.exp(t)
-    return solution_x
-
-def analytical_sol(t0,t1, step_sizes, sol_x):
-    t_a = np.arange(t0, t1, step_sizes)
-    x_a = np.zeros(len(t_a))
-    for i in range(len(t_a)):
-        x_a[i] = sol_x(t_a[i])
-    return t_a,x_a
-
 '''
 Function to compute each euler steps
 '''
 def euler_step(vars, t_pre, ODE, step_size,**kwargs):
-    vars = vars + step_size * ODE(vars,t_pre,**kwargs)
+    vars = vars + step_size * ODE(t_pre,vars,**kwargs)
     return vars
 
 '''
@@ -33,10 +17,10 @@ Finds each RK4 step for the system of ODEs
 '''
 # N can be outside function make function so its just one step
 def rk4(vars, t_pre, ODE, step_size,**kwargs):
-    k1 = step_size*ODE(vars,t_pre,**kwargs)
-    k2 = step_size*ODE(vars+(k1/2),t_pre+(step_size/2),**kwargs)
-    k3 = step_size*ODE(vars+(k2/2),t_pre+(step_size/2),**kwargs)
-    k4 = step_size*ODE(vars+(k3),t_pre+(step_size),**kwargs)
+    k1 = step_size*ODE(t_pre,vars,**kwargs)
+    k2 = step_size*ODE(t_pre+(step_size/2),vars+(k1/2),**kwargs)
+    k3 = step_size*ODE(t_pre+(step_size/2),vars+(k2/2),**kwargs)
+    k4 = step_size*ODE(t_pre+(step_size),vars+(k3),**kwargs)
     k = (1/6)*(k1 + 2*k2 + 2*k3 + k4)
     vars = vars + k
     return vars
@@ -72,11 +56,10 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
     if step_size % gap == 0:
         n = gap/step_size
         extra_step = 0
-        vars = do_step(vars,t0,step_size,ODE,n,extra_step,rk_e,**kwargs)
     else:
         n = (gap/step_size).astype(int)
         extra_step = gap - n*step_size
-        vars = do_step(vars,t0,step_size,ODE,n,extra_step,rk_e,**kwargs)
+    vars = do_step(vars,t0,step_size,ODE,n,extra_step,rk_e,**kwargs)
     return vars
 
 '''
@@ -85,64 +68,29 @@ and the initial value.
 it then returns an array of independant and dependant variables and solutions
 '''
 # n is the number of x's wanted between x0 and target solution
-def solve_ode(inits,t0,tt, n, ODE,step_size, rk_e, **kwargs):
-    x_sols = [inits[0]]
-    y_sols = [inits[1]]
+def solve_ode(vars,t0,tt, ODE,step_size, rk_e, **kwargs):
+    n = 500
+    sols = [vars]
     t_vals = [t0]
-    vars = inits
     steps = (tt-t0)/n
-    print(tt,t0,n,steps)
-    t2 = t0 + steps
     for i in range(n+1):
+        t2 = t0 + steps
         vars = solve_to(vars, t0, ODE, t2, step_size, rk_e, **kwargs)
         # MIGHT WANT TO CHANGE THIS SO IT JUST ACCEPTS ONE VALUE OF VARS
-        x_sols.append(vars[0])
-        y_sols.append(vars[1])
+        sols.append(vars)
         t0 = t2
-        t2 += steps
         t_vals.append(t0)
-    return t_vals,x_sols,y_sols
+    sols = np.asarray(sols)
+    t_vals = np.asarray(t_vals)
+    return t_vals, sols
 
-'''
-error finder computes the error in approximation using the difference between
-analytical and approximated solutions
-'''
 
-def error_finder(x_sols_array,t_vals_array,sol_x):
-    first_counter = 0
-    error_arrays = []
-    for sols in x_sols_array:
-        err = abs(sol_x(t_vals_array[first_counter][-1]) - sols[-1])
-        error_arrays.append(err)
-        first_counter += 1
-    return error_arrays
-
-def objective(v0):
-    sol = solve_ivp(F, [0, 5], \
-            [y0, v0], t_eval = t_eval)
-    y = sol.y[0]
-    return y[-1] - 50
-
-def shooitng():
-    tol = 0.1
-    while err >= tol:
-        # solve_ivp(ODE, y0 bounds, [min y0 , x_guess], range of values of t)
-        x_guess = solve_ivp(ODE, [0, 5], [y0, x_guess], t_eval = t_eval)
-
-    x0, = fsolve(objective, 10)
-    return x0
-# https://pythonnumericalmethods.berkeley.edu/notebooks/chapter23.02-The-Shooting-Method.html
-
-#sol = odeint(ODE, x0, delta_t, args=(x,t)
-
-def main(t0,tt,x0,y0,ODE,n, deltat_max, step_sizes,**kwargs):
+def main(t0,tt,x0,y0,ODE, deltat_max, step_sizes,**kwargs):
+    n = 500
     inits = np.array([x0,y0])
     idxs_array = []
     t_vals_array = []
-    x_sols_array = []
-    x_sols_array_runge = []
-    y_sols_array = []
-    y_sols_array_runge = []
+    sols_array = []
     for j in range(len(step_sizes)):
         if step_sizes[j] > np.float64(deltat_max) or step_sizes[j] == np.float64(0):
             # remove stepsize or dont use stepsize
@@ -150,50 +98,17 @@ def main(t0,tt,x0,y0,ODE,n, deltat_max, step_sizes,**kwargs):
             idxs_array.append(idx)
         else:
             # (x0,t0,tt, n, ODE,deltat_max, rk_e) use sys to run
-            t_vals_runge, x_sols_runge,y_sols_runge = solve_ode(inits,t0,tt, n, ODE,step_sizes[j],"--runge",**kwargs)
-            t_vals, x_sols,y_sols = solve_ode(inits,t0,tt, n, ODE,step_sizes[j],"--euler",**kwargs)
+            t_vals, sols = solve_ode(inits,t0,tt, ODE,step_sizes[j],"--runge",**kwargs)
             t_vals_array.append(t_vals)
-            x_sols_array.append(x_sols)
-            x_sols_array_runge.append(x_sols_runge)
-            y_sols_array.append(y_sols)
-            y_sols_array_runge.append(y_sols_runge)
+            sols_array.append(sols)
+
     step_sizes = np.delete(step_sizes, idxs_array)
-    #step_sizes =  np.linspace(0,1,101) # stepsize
 
-
-    max_y = max(x_sols_array_runge[0])  # Find the maximum y value
-    max_x = t_vals_array[0][x_sols_array_runge[0].index(max_y)]
-    plt.plot(t_vals_array[0], x_sols_array_runge[0], label="runge")
-    plt.plot(t_vals_array[0], y_sols_array_runge[0], label="runge")
+    plt.plot(t_vals_array[0], sols_array[0][:,0], label="runge")
+    plt.plot(t_vals_array[0], sols_array[0][:,1], label="runge")
     #plt.plot(max_x, max_y, 'o')
     plt.legend()
     plt.xlabel("t")
     plt.ylabel("x(t),y(t)")
     plt.show()
-    return x_sols_array_runge[0], y_sols_array_runge[0]
-
-    '''
-
-    for i in range(len(t_vals_array)):
-        plt.plot(t_vals_array[i], x_sols_array[i], label="euler")
-        plt.plot(t_vals_array[i], x_sols_array_runge[i], label="runge")
-        plt.plot(t_vals_array[i], y_sols_array[i], label="euler")
-        plt.plot(t_vals_array[i], y_sols_array_runge[i], label="runge")
-
-    for i in range(len(x_sols_array)):
-        plt.plot(t_vals_array[i], x_sols_array[i], label="approximation")
-        plt.plot(t_vals_array[i], x_sols_array_runge[i], label="approximation")
-
-    plt.legend()
-    plt.xlabel("t")
-    plt.ylabel("x(t)")
-    plt.title("euler method approximation")
-    errs = error_finder(x_sols_array,t_vals_array,sol_x)
-    errs_runge = error_finder(x_sols_array_runge,t_vals_array,sol_x)
-    plt.loglog(step_sizes, errs, label="euler")
-    plt.loglog(step_sizes, errs_runge, label="runge")
-    plt.ylabel("Error")
-    plt.xlabel("Step Size")
-    plt.title("Error in approximation compared to stepsize")
-    plt.legend()
-    '''
+    return sols_array[0][:,0], sols_array[0][:,1]
