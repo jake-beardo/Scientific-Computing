@@ -20,10 +20,10 @@ from matplotlib import pyplot as plt
     #sol = newton(lambda sols, ODE: shooting(ODE, sols, **kwargs),[1, 1, 10],0.01,1000)
 
 
-def main(**kwargs):
-    t_vals, sols = solve_ode([0.1, 0.1], 100, 200, lokta, 0.1, '--runge', **kwargs)
+def main(vars,t0,tt, ODE, step_size, rk_e, **kwargs):
+    t_vals, sols = solve_ode(vars,t0,tt, ODE, step_size, rk_e, **kwargs)
     period_guess = period_finder(t_vals, sols)
-    sol = fsolve(lambda sols, ODE: shooting(ODE, sols, **kwargs), [0.1, 0.1, period_guess], lokta)
+    sol = fsolve(lambda sols, ODE: shooting(t0,tt, sols, ODE, step_size, rk_e, **kwargs), [0.2, 0.2, period_guess], lokta)
     vars = sol[:-1]
     tt = sol[-1]
     print('U0: ', vars)
@@ -57,8 +57,8 @@ def period_finder(ts, sols):
 
 # specific integrate function to return the difference from vars and the final
 # point for vector sols
-def integrate(rk_e, ODE, vars, t0, tt, **kwargs):
-    t_values, sols = solve_ode(vars,t0,tt, ODE, 0.125, rk_e, **kwargs)
+def integrate(vars, t0, tt, ODE, step_size, rk_e, **kwargs):
+    t_values, sols = solve_ode(vars,t0,tt, ODE, step_size, rk_e, **kwargs)
     return sols[-1, :] - vars
 
 
@@ -67,10 +67,12 @@ def get_phase_conditon(ODE, vars, **kwargs):
     return np.array([ODE(0, vars,**kwargs)[0]])
 
 
-def shooting(ODE, sols, **kwargs):
-    vars = sols[:-1]
-    tt = sols[-1]
-    return np.concatenate((integrate('--runge', ODE, vars, 0, tt, **kwargs), get_phase_conditon(ODE, vars, **kwargs)))
+def shooting(t0,tt,sols, ODE, step_size, rk_e, **kwargs):
+
+    ''' THIS IS WHERE IM GOING WRONG '''
+    vars = sols[0:2]
+    print('sols', sols, vars)
+    return np.concatenate((integrate(vars, t0, tt, ODE, step_size, rk_e, **kwargs), get_phase_conditon(ODE, vars, **kwargs)))
 
 
     def newton(f,Df,x0,epsilon,max_iter):
@@ -124,4 +126,4 @@ def shooting(ODE, sols, **kwargs):
 
 
 if __name__ == '__main__':
-    main(a=1,b=0.2,d=0.1)
+    main([0.1, 0.1], 100, 200, lokta, 0.01, '--runge', a=1,b=0.2,d=0.1)

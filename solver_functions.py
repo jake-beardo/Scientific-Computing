@@ -57,7 +57,8 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
         n = gap/step_size
         extra_step = 0
     else:
-        print((gap/step_size))
+        print('n:',(gap/step_size))
+        print('n int:',int(gap/step_size))
         n = int(gap/step_size)
         extra_step = gap - n*step_size
     vars = do_step(vars,t0,step_size,ODE,n,extra_step,rk_e,**kwargs)
