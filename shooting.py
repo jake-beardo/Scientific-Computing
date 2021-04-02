@@ -5,7 +5,7 @@ from solver_functions import *
 from Lokta_Volterra import lokta
 from matplotlib import pyplot as plt
 
-    '''
+'''
     n = 500
     time_sol = solve_ivp(lokta,(0,100),[1 , 1],t_eval=np.linspace(0,100,n))
     plt.plot(time_sol.t,time_sol.y.T)
@@ -15,18 +15,18 @@ from matplotlib import pyplot as plt
     # newton(f,Df,x0,epsilon,max_iter)
     sht = shooting(lokta, sols, **kwargs)
     print('shooot', sht)
-    '''
+'''
     #sol = newton(lokta, derivative, x0, epsilon, max_iter)
     #sol = newton(lambda sols, ODE: shooting(ODE, sols, **kwargs),[1, 1, 10],0.01,1000)
 
 
 def main(**kwargs):
-    sol = fsolve(lambda sols, ODE: shooting(ODE, sols, **kwargs), [1, 1, 10], lokta)
+    sol = fsolve(lambda sols, ODE: shooting(ODE, sols, **kwargs), [0.1, 0.1, 10], lokta)
     vars = sol[:-1]
     tt = sol[-1]
     print('U0: ', vars)
     print('Period: ',tt)
-    time_sol= solve_ivp(lambda t, vars: lokta(t, vars, **kwargs),(0,tt), vars, t_eval=np.linspace(0,tt,500))
+    time_sol = solve_ivp(lambda t, vars: lokta(t, vars, **kwargs),(0,tt), vars, t_eval=np.linspace(0,tt,500))
     #time_sol = solve_ivp(lokta,(0,tt), vars, t_eval=np.linspace(0,tt,500))
     plt.plot(time_sol.t,time_sol.y.T)
     plt.xlabel("time")
@@ -104,4 +104,4 @@ def shooting(ODE, sols, **kwargs):
 
 
 if __name__ == '__main__':
-    main(a=1,b=0.24,d=0.1)
+    main(a=1,b=0.2,d=0.1)
