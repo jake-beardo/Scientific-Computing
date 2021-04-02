@@ -21,7 +21,9 @@ from matplotlib import pyplot as plt
 
 
 def main(**kwargs):
-    sol = fsolve(lambda sols, ODE: shooting(ODE, sols, **kwargs), [0.1, 0.1, 10], lokta)
+    t_vals, sols = solve_ode([0.1, 0.1], 100, 200, lokta, 0.1, '--runge', **kwargs)
+    period_guess = period_finder(t_vals, sols)
+    sol = fsolve(lambda sols, ODE: shooting(ODE, sols, **kwargs), [0.1, 0.1, period_guess], lokta)
     vars = sol[:-1]
     tt = sol[-1]
     print('U0: ', vars)
@@ -34,55 +36,23 @@ def main(**kwargs):
     plt.show()
 
 
+def period_finder(ts, sols):
+    i_count = 0
+    peaks = []
+    for i in sols[1:,0]:
+        print(i)
+        if i > sols[i_count,0] and i > sols[i_count+2,0]:
+            print('do the bit')
+            peaks.append(ts[i_count+1])
+
+        i_count += 1
+    peaks = np.asarray(peaks)
+    peak_diffs = np.diff(peaks)
+    ave_period = np.mean(peak_diffs)
+    print('ave_period', ave_period)
+    return ave_period
 
 
-def newton(f,Df,x0,epsilon,max_iter):
-    '''Approximate solution of f(x)=0 by Newton's method.
-
-    Parameters
-    ----------
-    f : function
-        Function for which we are searching for a solution f(x)=0.
-    Df : function
-        Derivative of f(x).
-    x0 : number
-        Initial guess for a solution f(x)=0.
-    epsilon : number
-        Stopping criteria is abs(f(x)) < epsilon.
-    max_iter : integer
-        Maximum number of iterations of Newton's method.
-
-    Returns
-    -------
-    xn : number
-        Implement Newton's method: compute the linear approximation
-        of f(x) at xn and find x intercept by the formula
-            x = xn - f(xn)/Df(xn)
-        Continue until abs(f(xn)) < epsilon and return xn.
-        If Df(xn) == 0, return None. If the number of iterations
-        exceeds max_iter, then return None.
-
-    Examples
-    --------
-    >>> f = lambda x: x**2 - x - 1
-    >>> Df = lambda x: 2*x - 1
-    >>> newton(f,Df,1,1e-8,10)
-    Found solution after 5 iterations.
-    1.618033988749989
-    '''
-    xn = x0
-    for n in range(0,max_iter):
-        fxn = f(xn)
-        if abs(fxn) < epsilon:
-            print('Found solution after',n,'iterations.')
-            return xn
-        Dfxn = Df(xn)
-        if Dfxn == 0:
-            print('Zero derivative. No solution found.')
-            return None
-        xn = xn - fxn/Dfxn
-    print('Exceeded maximum iterations. No solution found.')
-    return None
 
 
 # specific integrate function to return the difference from vars and the final
@@ -101,6 +71,56 @@ def shooting(ODE, sols, **kwargs):
     vars = sols[:-1]
     tt = sols[-1]
     return np.concatenate((integrate('--runge', ODE, vars, 0, tt, **kwargs), get_phase_conditon(ODE, vars, **kwargs)))
+
+
+    def newton(f,Df,x0,epsilon,max_iter):
+        '''Approximate solution of f(x)=0 by Newton's method.
+
+        Parameters
+        ----------
+        f : function
+            Function for which we are searching for a solution f(x)=0.
+        Df : function
+            Derivative of f(x).
+        x0 : number
+            Initial guess for a solution f(x)=0.
+        epsilon : number
+            Stopping criteria is abs(f(x)) < epsilon.
+        max_iter : integer
+            Maximum number of iterations of Newton's method.
+
+        Returns
+        -------
+        xn : number
+            Implement Newton's method: compute the linear approximation
+            of f(x) at xn and find x intercept by the formula
+                x = xn - f(xn)/Df(xn)
+            Continue until abs(f(xn)) < epsilon and return xn.
+            If Df(xn) == 0, return None. If the number of iterations
+            exceeds max_iter, then return None.
+
+        Examples
+        --------
+        >>> f = lambda x: x**2 - x - 1
+        >>> Df = lambda x: 2*x - 1
+        >>> newton(f,Df,1,1e-8,10)
+        Found solution after 5 iterations.
+        1.618033988749989
+        '''
+        xn = x0
+        for n in range(0,max_iter):
+            fxn = f(xn)
+            if abs(fxn) < epsilon:
+                print('Found solution after',n,'iterations.')
+                return xn
+            Dfxn = Df(xn)
+            if Dfxn == 0:
+                print('Zero derivative. No solution found.')
+                return None
+            xn = xn - fxn/Dfxn
+        print('Exceeded maximum iterations. No solution found.')
+        return None
+
 
 
 if __name__ == '__main__':

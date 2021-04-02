@@ -57,7 +57,8 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
         n = gap/step_size
         extra_step = 0
     else:
-        n = (gap/step_size).astype(int)
+        print((gap/step_size))
+        n = int(gap/step_size)
         extra_step = gap - n*step_size
     vars = do_step(vars,t0,step_size,ODE,n,extra_step,rk_e,**kwargs)
     return vars
@@ -69,7 +70,7 @@ it then returns an array of independant and dependant variables and solutions
 '''
 # n is the number of x's wanted between x0 and target solution
 def solve_ode(vars,t0,tt, ODE,step_size, rk_e, **kwargs):
-    n = 500
+    n = 100
     sols = [vars]
     t_vals = [t0]
     steps = (tt-t0)/n
@@ -98,6 +99,7 @@ def main(t0,tt,x0,y0,ODE, deltat_max, step_sizes,**kwargs):
             idxs_array.append(idx)
         else:
             # (x0,t0,tt, n, ODE,deltat_max, rk_e) use sys to run
+            print(inits,t0,tt, ODE,step_sizes[j],"--runge")
             t_vals, sols = solve_ode(inits,t0,tt, ODE,step_sizes[j],"--runge",**kwargs)
             t_vals_array.append(t_vals)
             sols_array.append(sols)
