@@ -23,7 +23,7 @@ from matplotlib import pyplot as plt
 def main(vars,t0,tt, ODE, step_size, rk_e, **kwargs):
     t_vals, sols = solve_ode(vars,t0,tt, ODE, step_size, rk_e, **kwargs)
     period_guess = period_finder(t_vals, sols)
-    sol = fsolve(lambda sols, ODE: shooting(t0,tt, sols, ODE, step_size, rk_e, **kwargs), [0.2, 0.2, period_guess], lokta)
+    sol = fsolve(lambda sols, ODE: shooting(t0,tt, sols, ODE, step_size, rk_e, **kwargs), [vars[0], vars[1], period_guess], lokta)
     vars = sol[:-1]
     tt = sol[-1]
     print('U0: ', vars)
