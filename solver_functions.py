@@ -25,6 +25,7 @@ def rk4(vars, t_pre, ODE, step_size,**kwargs):
     vars = vars + k
     return vars
 
+
 '''
 do_step does each step and decides whether it needs to do euler or RK4
 '''
@@ -37,7 +38,7 @@ def do_step(vars,t0,step_size,ODE,n,extra_step,rk_e,**kwargs):
 
             t += step_size
         vars = euler_step(vars, t, ODE, extra_step,**kwargs)
-    elif rk_e == "--runge":
+    else:
         for i in range(n):
 
             # rk4(x_pre, t_pre, ODE, step_size)
@@ -70,8 +71,7 @@ and the initial value.
 it then returns an array of independant and dependant variables and solutions
 '''
 # n is the number of x's wanted between x0 and target solution
-def solve_ode(vars,t0,tt, ODE,step_size, rk_e, **kwargs):
-    n = 100
+def solve_ode(vars,t0,tt, ODE,step_size,n, rk_e, **kwargs):
     sols = [vars]
     t_vals = [t0]
     steps = (tt-t0)/n
@@ -101,7 +101,7 @@ def main(t0,tt,x0,y0,ODE, deltat_max, step_sizes,**kwargs):
         else:
             # (x0,t0,tt, n, ODE,deltat_max, rk_e) use sys to run
             print(inits,t0,tt, ODE,step_sizes[j],"--runge")
-            t_vals, sols = solve_ode(inits,t0,tt, ODE,step_sizes[j],"--runge",**kwargs)
+            t_vals, sols = solve_ode(inits,t0,tt, ODE,step_sizes[j],n,"--runge",**kwargs)
             t_vals_array.append(t_vals)
             sols_array.append(sols)
 

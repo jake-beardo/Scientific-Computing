@@ -1,6 +1,11 @@
 import numpy as np
 from solver_functions import *
 
+
+#def func(t,vars,a,b,d):
+    # print('vars are: ',vars)
+#    return np.array([vars[0]*(1-vars[0]) - (a*vars[0]*vars[1])/(d+vars[0]), b*vars[1]*(1 - (vars[1]/vars[0]))])
+
 def func(t,vars,a,b,d):
     # print('vars are: ',vars)
     return np.array([vars[0]*(1-vars[0]) - (a*vars[0]*vars[1])/(d+vars[0]), b*vars[1]*(1 - (vars[1]/vars[0]))])
@@ -36,7 +41,7 @@ if __name__ == "__main__":
     # main(t0,tt,x0,y0,ODE, deltat_max, step_sizes)
     x_sols, y_sols = shooting_main(t0,tt,0.1,0.1,ODE, 0.5, step_sizes,a=1,b=b,d=0.1)
         # plt.plot(x_sols, y_sols, label=b)
-        # 
+        #
         # plt.xlabel("t")
         # plt.ylabel("x(t),y(t)")
         # plt.legend()
