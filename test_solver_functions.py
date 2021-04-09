@@ -5,7 +5,7 @@ import solver_functions
 import numpy as np
 
 class Test_solver_functions(unittest.TestCase):
-    
+
     @classmethod
     def setUpClass(cls):
         print('setupClass')
@@ -20,8 +20,18 @@ class Test_solver_functions(unittest.TestCase):
             return np.array([t_pre*(vars[0]+ np.sin(t_pre*np.pi)), vars[1]+np.sin(t_pre*np.pi)])
         def func2(vars, t_pre,a):
             return np.array(a*(vars + np.sin(t_pre)))
+        def hopf(u_vals, t, beta, sigma):
+            return np.array([beta*u_vals[0]-u_vals[1]+sigma*u_vals[0]*(u_vals[0]^2 + u_vals[1]^2),u_vals[0]+beta*u_vals[1]+sigma*u_vals[1]*(u_vals[0]^2 + u_vals[1]^2)])
         self.func1 = func1
         self.func2 = func2
+        self.hopf = hopf
+        
+    ''' Solution to hopf '''
+    # u_vals[0] = sqrt(beta)*np.cos(t+theta)
+    # u_vals[1] = sqrt(beta)*np.sin(t+theta)
+    # # where theta is the phase
+
+
 
     def tearDown(self):
         print('tearDown\n')

@@ -35,13 +35,10 @@ def do_step(vars,t0,step_size,ODE,n,extra_step,rk_e,**kwargs):
     if rk_e == "--euler":
         for i in range(n):
             vars = euler_step(vars, t, ODE, step_size,**kwargs)
-
             t += step_size
         vars = euler_step(vars, t, ODE, extra_step,**kwargs)
     else:
         for i in range(n):
-
-            # rk4(x_pre, t_pre, ODE, step_size)
             vars = rk4(vars, t, ODE, step_size,**kwargs)
             t += step_size
         vars = rk4(vars, t, ODE, extra_step,**kwargs)
@@ -58,8 +55,6 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
         n = gap/step_size
         extra_step = 0
     else:
-        print('n:',(gap/step_size))
-        print('n int:',int(gap/step_size))
         n = int(gap/step_size)
         extra_step = gap - n*step_size
     vars = do_step(vars,t0,step_size,ODE,n,extra_step,rk_e,**kwargs)
@@ -85,33 +80,3 @@ def solve_ode(vars,t0,tt, ODE,step_size,n, rk_e, **kwargs):
     sols = np.asarray(sols)
     t_vals = np.asarray(t_vals)
     return t_vals, sols
-
-
-def main(t0,tt,x0,y0,ODE, deltat_max, step_sizes,**kwargs):
-    n = 500
-    inits = np.array([x0,y0])
-    idxs_array = []
-    t_vals_array = []
-    sols_array = []
-    for j in range(len(step_sizes)):
-        if step_sizes[j] > np.float64(deltat_max) or step_sizes[j] == np.float64(0):
-            # remove stepsize or dont use stepsize
-            idx = np.where(step_sizes==step_sizes[j])
-            idxs_array.append(idx)
-        else:
-            # (x0,t0,tt, n, ODE,deltat_max, rk_e) use sys to run
-            print(inits,t0,tt, ODE,step_sizes[j],"--runge")
-            t_vals, sols = solve_ode(inits,t0,tt, ODE,step_sizes[j],n,"--runge",**kwargs)
-            t_vals_array.append(t_vals)
-            sols_array.append(sols)
-
-    step_sizes = np.delete(step_sizes, idxs_array)
-
-    plt.plot(t_vals_array[0], sols_array[0][:,0], label="runge")
-    plt.plot(t_vals_array[0], sols_array[0][:,1], label="runge")
-    #plt.plot(max_x, max_y, 'o')
-    plt.legend()
-    plt.xlabel("t")
-    plt.ylabel("x(t),y(t)")
-    plt.show()
-    return sols_array[0][:,0], sols_array[0][:,1]
