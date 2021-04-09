@@ -9,8 +9,41 @@ import sys
 Function to compute each euler steps
 '''
 def euler_step(vars, t_pre, ODE, step_size,**kwargs):
-    vars = vars + step_size * ODE(t_pre,vars,**kwargs)
-    return vars
+    '''Finds numerical approximation for a function at point t + stepsize ahead.
+
+    Parameters
+    ----------
+    vars : numpy array or number
+        The value(s) or approximations of the function at either the intial guess
+        or previous step taken.
+    ODE : function
+        Differnetial equation or system of differnetial equations that take vars
+        and t values.
+    t_pre : number
+        Previous or intial t value. Needed in the ODE function to approimate the
+        next step.
+    step_size : number
+        This is the size of the 'step' the euler funtion will approximate using
+        e.g it will return the approimation for value(s) of the funtion at
+        t_pre + step_size.
+    **kwargs : variables
+        This may include any additional variables that may be used in the system
+        of ODE's.
+
+    Returns
+    -------
+    sols : numpy array or number
+        The value(s) or approximations of the function at t_pre + step_size. 
+    Examples
+    --------
+    >>> f = lambda x: x**2 - x - 1
+    >>> Df = lambda x: 2*x - 1
+    >>> newton(f,Df,1,1e-8,10)
+    Found solution after 5 iterations.
+    1.618033988749989
+    '''
+    sols = vars + step_size * ODE(t_pre,vars,**kwargs)
+    return sols
 
 '''
 Finds each RK4 step for the system of ODEs
@@ -66,10 +99,11 @@ and the initial value.
 it then returns an array of independant and dependant variables and solutions
 '''
 # n is the number of x's wanted between x0 and target solution
-def solve_ode(vars,t0,tt, ODE,step_size,n, rk_e, **kwargs):
+def solve_ode(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
+    t0 = 0
     sols = [vars]
     t_vals = [t0]
-    steps = (tt-t0)/n
+    steps = tt/n
     for i in range(n+1):
         t2 = t0 + steps
         vars = solve_to(vars, t0, ODE, t2, step_size, rk_e, **kwargs)

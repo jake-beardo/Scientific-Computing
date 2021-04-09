@@ -19,23 +19,16 @@ from matplotlib import pyplot as plt
 # sol = newton(func, derivative, x0, epsilon, max_iter)
 # sol = newton(lambda sols, ODE: shooting(ODE, sols, **kwargs),[1, 1, 10],0.01,1000)
 def shooting_main(vars,t0,tt, ODE, step_size,n, rk_e, **kwargs):
-    t_vals, sols = solve_ode(vars,t0,tt, ODE, step_size,n, rk_e, **kwargs)
+    t_vals, sols = solve_ode(vars,tt, ODE, **kwargs)
     period_guess = period_finder(t_vals, sols)
-    guess_inits = np.array([np.mean(sols[:,0]), np.mean(sols[:,1])])
     #sol = newton(t_vals, sols, ODE, t0, np.full(np.shape(vars), 0.01), 1000,**kwargs)
-    sol = fsolve(lambda sols, ODE: shooting(t0,tt, sols, ODE, step_size,n, rk_e, **kwargs), [guess_inits[0], guess_inits[1], period_guess], ODE)
+    sol = fsolve(lambda sols, ODE: shooting(t0,tt, sols, ODE, **kwargs), [guess_inits[0], guess_inits[1], period_guess], ODE)
     vars = sol[:-1]
     tt = sol[-1]
     print('U0: ', vars)
     print('Period: ',tt)
     return vars, tt
 
-    time_sol = solve_ivp(lambda t, vars: func(t, vars, **kwargs),(0,tt), vars, t_eval=np.linspace(0,tt,500))
-    #time_sol = solve_ivp(func,(0,tt), vars, t_eval=np.linspace(0,tt,500))
-    plt.plot(time_sol.t,time_sol.y.T)
-    plt.xlabel("time")
-    plt.ylabel("population change")
-    plt.show()
 
 def period_finder(ts, sols):
     i_count = 0
@@ -58,8 +51,8 @@ def period_finder(ts, sols):
 
 # specific integrate function to return the difference from vars and the final
 # point for vector sols
-def integrate(vars, t0, tt, ODE, step_size, n,rk_e, **kwargs):
-    t_values, sols = solve_ode(vars,t0,tt, ODE, step_size,n, rk_e, **kwargs)
+def integrate(vars, tt, ODE, **kwargs):
+    t_values, sols = solve_ode(vars,tt, ODE, **kwargs)
     return sols[-1, :] - vars
 
 
@@ -68,12 +61,14 @@ def get_phase_conditon(ODE, vars, **kwargs):
     return np.array([ODE(0, vars,**kwargs)[0]])
 
 
-def shooting(t0,tt,sols, ODE, step_size, n, rk_e, **kwargs):
-    print('init sols', sols)
-    ''' THIS IS WHERE IM GOING WRONG '''
-    vars = sols[0:2]
+def shooting(t0,tt,sols, ODE, **kwargs):
+    vars = sols[:-1]
+    tt = sols[-1]
     print('sols', sols, vars)
-    return np.concatenate((integrate(vars, t0, tt, ODE, step_size, n, rk_e, **kwargs), get_phase_conditon(ODE, vars, **kwargs)))
+    return np.concatenate((integrate(vars, tt, ODE, **kwargs), get_phase_conditon(ODE, vars, **kwargs)))
+
+
+
 
 def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()

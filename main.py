@@ -7,7 +7,7 @@ from solver_functions import *
     # print('vars are: ',vars)
 #    return np.array([vars[0]*(1-vars[0]) - (a*vars[0]*vars[1])/(d+vars[0]), b*vars[1]*(1 - (vars[1]/vars[0]))])
 
-def func(t,vars,a,b,d):
+def lokta(t,vars,a,b,d):
     # print('vars are: ',vars)
     return np.array([vars[0]*(1-vars[0]) - (a*vars[0]*vars[1])/(d+vars[0]), b*vars[1]*(1 - (vars[1]/vars[0]))])
 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
 
     #t_vals, sols = solve_ode([1,1],t0,tt, ODE, step_size, 1000, 0.1, a=1,b=b,d=0.1)
-    t_vals, sols = solve_ode([1,1],t0,tt, ODE, step_size, 1000, 0.1, beta=1,sigma=-1cl)
+    t_vals, sols = solve_ode([1,1],tt, ODE, step_size, 1000, 0.1, beta=1,sigma=-1 )
 
     print(t_vals, sols)
     plt.plot(t_vals, sols[:,0])
