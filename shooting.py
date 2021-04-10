@@ -18,11 +18,12 @@ from matplotlib import pyplot as plt
 '''
 # sol = newton(func, derivative, x0, epsilon, max_iter)
 # sol = newton(lambda sols, ODE: shooting(ODE, sols, **kwargs),[1, 1, 10],0.01,1000)
-def shooting_main(vars,t0,tt, ODE, step_size,n, rk_e, **kwargs):
+def shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs):
     t_vals, sols = solve_ode(vars,tt, ODE, **kwargs)
+    print(sols)
     period_guess = period_finder(t_vals, sols)
     #sol = newton(t_vals, sols, ODE, t0, np.full(np.shape(vars), 0.01), 1000,**kwargs)
-    sol = fsolve(lambda sols, ODE: shooting(t0,tt, sols, ODE, **kwargs), [vars[0], vars[1], period_guess], ODE)
+    sol = fsolve(lambda sols, ODE: shooting(tt, sols, ODE, **kwargs), [vars[0], vars[1], period_guess], ODE)
     vars = sol[:-1]
     tt = sol[-1]
     print('U0: ', vars)
@@ -33,10 +34,8 @@ def shooting_main(vars,t0,tt, ODE, step_size,n, rk_e, **kwargs):
 def period_finder(ts, sols):
     i_count = 0
     peaks = []
-    for i in sols[1:,0]:
-        print(i)
+    for i in sols[1:-1,0]:
         if i > sols[i_count,0] and i > sols[i_count+2,0]:
-            print('do the bit')
             peaks.append(ts[i_count+1])
 
         i_count += 1
@@ -61,7 +60,7 @@ def get_phase_conditon(ODE, vars, **kwargs):
     return np.array([ODE(0, vars,**kwargs)[0]])
 
 
-def shooting(t0,tt,sols, ODE, **kwargs):
+def shooting(tt,sols, ODE, **kwargs):
     vars = sols[:-1]
     tt = sols[-1]
     print('sols', sols, vars)
