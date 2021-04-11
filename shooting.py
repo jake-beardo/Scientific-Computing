@@ -19,7 +19,13 @@ from matplotlib import pyplot as plt
 # sol = newton(func, derivative, x0, epsilon, max_iter)
 # sol = newton(lambda sols, ODE: shooting(ODE, sols, **kwargs),[1, 1, 10],0.01,1000)
 def shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs):
+
     t_vals, sols = solve_ode(vars,tt, ODE, **kwargs)
+    plt.plot(t_vals, sols[:,0])
+    plt.plot(t_vals, sols[:,1])
+    plt.xlabel("t")
+    plt.ylabel("x(t),y(t)")
+    plt.show()
     print(sols)
     period_guess = period_finder(t_vals, sols)
     #sol = newton(t_vals, sols, ODE, t0, np.full(np.shape(vars), 0.01), 1000,**kwargs)
@@ -40,6 +46,8 @@ def period_finder(ts, sols):
 
         i_count += 1
     peaks = np.asarray(peaks)
+    peaks = peaks[3:]
+    print('amount of peaks', len(peaks))
     peak_diffs = np.diff(peaks)
     ave_period = np.mean(peak_diffs)
     print('ave_period', ave_period)
