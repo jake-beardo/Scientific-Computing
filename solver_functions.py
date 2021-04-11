@@ -132,13 +132,16 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
     1.9562947385102594
     '''
     gap = t2-t0
-    if step_size % gap == 0:
-        n = gap/step_size
+    if gap == 0:
+        return vars
+    elif step_size % gap == 0:
+        n = int(gap/step_size)
         extra_step = 0
     else:
         n = int(gap/step_size)
         extra_step = gap - n*step_size
     t = t0
+    print(n)
     if rk_e == "--euler":
         for i in range(n):
             vars = euler_step(vars, t, ODE, step_size,**kwargs)
@@ -152,12 +155,54 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
     return sols
 
 '''
-solve_ode runs a for loop that stores all solutions between the target value
-and the initial value.
-it then returns an array of independant and dependant variables and solutions
+
 '''
 # n is the number of x's wanted between x0 and target solution
 def solve_ode(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
+    '''
+    This runs a for loop that stores all solutions for steps between the target
+    value and the initial value of zero.
+
+    Parameters
+    ----------
+    vars : numpy array or number
+        The value(s) or approximations of the function at either the intial guess
+        or previous step taken.
+    tt  :  number
+        The target value of t that the funtion will solve up to.
+    ODE :  function
+        Differnetial equation or system of differnetial equations. Defined as a
+        function.
+    step_size : number
+        This is the size of the 'step' the euler funtion will approximate using.
+    n : number
+        The number of steps you want to take between the inital value and target
+        value. The more steps (i.e. higher n) the better the approimation will
+        be. n is set to 500 by defult.
+    rk_e : string
+        String '--euler' chooses to compute step using euler method. Otherwise
+        will use 4th order Runge-Kutta method.
+    **kwargs : variables
+        This may include any additional variables that may be used in the system
+        of ODE's.
+
+    Returns
+    -------
+    t_vals : numpy array
+        This is the array of t values that have been approimated for.
+    sols : numpy array
+        The array of values that have been approimated for each corresponding
+        t value.
+
+    Examples
+    --------
+    >>> def ODE(t,x):
+            return np.sin(x)
+    >>> solve_ode(1,1,ODE)
+    (array([0.   , 0.002,......, 1.]), array([1., 1.00168385,
+        ,.......,1.94328858]))
+
+    '''
     t0 = 0
     sols = [vars]
     t_vals = [t0]
@@ -172,3 +217,7 @@ def solve_ode(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     sols = np.asarray(sols)
     t_vals = np.asarray(t_vals)
     return t_vals, sols
+
+def ODE(t,x):
+    return np.sin(x)
+print('here',solve_ode(1,1,ODE))
