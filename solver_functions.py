@@ -5,9 +5,7 @@ from scipy.optimize import fsolve
 import math
 import sys
 
-'''
-Function to compute each euler steps
-'''
+
 def euler_step(vars, t_pre, ODE, step_size,**kwargs):
     '''Finds numerical approximation for a function at point t + stepsize ahead.
 
@@ -141,7 +139,6 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
         n = int(gap/step_size)
         extra_step = gap - n*step_size
     t = t0
-    print(n)
     if rk_e == "--euler":
         for i in range(n):
             vars = euler_step(vars, t, ODE, step_size,**kwargs)
@@ -153,6 +150,11 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
             t += step_size
         sols = rk4(vars, t, ODE, extra_step,**kwargs)
     return sols
+def func2(vars, t_pre,a):
+    return np.array(a*(vars + np.sin(t_pre)))
+def func1(t_pre,vars):
+    return np.array([t_pre*(vars[0]+ np.sin(t_pre*np.pi)), vars[1]+np.sin(t_pre*np.pi)])
+print(solve_to(np.array([-10,-11]), 10, func1, 12,0.001,'--runge'))
 
 '''
 
@@ -217,7 +219,3 @@ def solve_ode(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     sols = np.asarray(sols)
     t_vals = np.asarray(t_vals)
     return t_vals, sols
-
-def ODE(t,x):
-    return np.sin(x)
-print('here',solve_ode(1,1,ODE))
