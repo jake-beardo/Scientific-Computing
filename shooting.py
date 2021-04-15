@@ -5,19 +5,7 @@ from solver_functions import *
 from main import func
 from matplotlib import pyplot as plt
 
-'''
-    n = 500
-    time_sol = solve_ivp(func,(0,100),[1 , 1],t_eval=np.linspace(0,100,n))
-    plt.plot(time_sol.t,time_sol.y.T)
-    plt.show()
 
-    # scipy.optimize.fsolve(func, x0, args=(), fprime=None, full_output=0, col_deriv=0, xtol=1.49012e-08, maxfev=0, band=None, epsfcn=None, factor=100, diag=None)
-    # newton(f,Df,x0,epsilon,max_iter)
-    sht = shooting(func, sols, **kwargs)
-    print('shooot', sht)
-'''
-# sol = newton(func, derivative, x0, epsilon, max_iter)
-# sol = newton(lambda sols, ODE: shooting(ODE, sols, **kwargs),[1, 1, 10],0.01,1000)
 def shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs):
 
     t_vals, sols = solve_ode(vars,tt, ODE, **kwargs)
@@ -85,8 +73,7 @@ def period_finder(ts, sols):
 # point for vector sols
 def integrate(vars, tt, ODE, **kwargs):
     '''
-    This runs a for loop that stores all solutions for steps between the target
-    value and the initial value of zero.
+    Uses solve_ode to find the differnce in final solution values at tt for ode and the intial solutions at t0
 
     Parameters
     ----------
@@ -104,230 +91,106 @@ def integrate(vars, tt, ODE, **kwargs):
 
     Returns
     -------
-    t_vals : numpy array
-        This is the array of t values that have been approimated for.
-    sols : numpy array
-        The array of values that have been approimated for each corresponding
-        t value.
-
+    sols[-1, :] - vars : numpy array
+        Difference between the intial approimation and final approimation.
     Examples
     --------
     >>> def ODE(t,x):
-            return np.sin(x)
-    >>> solve_ode(1,1,ODE)
-    (array([0.   , 0.002,......, 1.]), array([1., 1.00168385,
-        ,.......,1.94328858]))
-
+            return np.sin(x**2) - (x**3 - 1)/x
+    >>> vars = np.array([0.1,0.1])
+    >>> tt = 2
+    >>> integrate(vars, tt, ODE)
+    [1.21813282 1.21813282]
     '''
     t_values, sols = solve_ode(vars,tt, ODE, **kwargs)
-    print('inteeeee',sols[-1, :] - vars)
     return sols[-1, :] - vars
 
+def ODE(t,x):
+    return np.sin(x**2) - (x**3 - 1)/x
+vars = np.array([0.1,0.1])
+tt = 2
+print('here')
+print(integrate(vars, tt, ODE))
 
-# phasecondition: dxdt = 0
 def get_phase_conditon(ODE, vars, **kwargs):
     '''
-    This runs a for loop that stores all solutions for steps between the target
-    value and the initial value of zero.
+    Finds the phase condition of a function i.e. when f'(x) = 0
 
     Parameters
     ----------
-    vars : numpy array or number
-        The value(s) or approximations of the function at either the intial guess
-        or previous step taken.
-    tt  :  number
-        The target value of t that the funtion will solve up to.
     ODE :  function
         Differnetial equation or system of differnetial equations. Defined as a
         function.
-    step_size : number
-        This is the size of the 'step' the euler funtion will approximate using.
-    n : number
-        The number of steps you want to take between the inital value and target
-        value. The more steps (i.e. higher n) the better the approimation will
-        be. n is set to 500 by defult.
-    rk_e : string
-        String '--euler' chooses to compute step using euler method. Otherwise
-        will use 4th order Runge-Kutta method.
+    vars : numpy array or number
+        The value(s) or approximations of the function at either the intial guess
+        or previous step taken.
     **kwargs : variables
         This may include any additional variables that may be used in the system
         of ODE's.
 
     Returns
     -------
-    t_vals : numpy array
-        This is the array of t values that have been approimated for.
-    sols : numpy array
-        The array of values that have been approimated for each corresponding
-        t value.
+    np.array([ODE(0, vars,**kwargs)[0]]) : numpy array
+        The phasecondition when the ode is equal to zero.
 
     Examples
     --------
     >>> def ODE(t,x):
             return np.sin(x)
-    >>> solve_ode(1,1,ODE)
-    (array([0.   , 0.002,......, 1.]), array([1., 1.00168385,
-        ,.......,1.94328858]))
-
+    >>> vars = np.array([0.1,0.1])
+    >>> get_phase_conditon(ODE, vars)
+    [0.09983342]
     '''
     return np.array([ODE(0, vars,**kwargs)[0]])
-
+def ODE(t,x):
+    return np.sin(x)
+vars = np.array([0.1,0.1])
+print(get_phase_conditon(ODE, vars))
 
 def shooting(tt,sols, ODE, **kwargs):
     '''
-    This runs a for loop that stores all solutions for steps between the target
-    value and the initial value of zero.
+    Uses the get_phase_conditon and integrate function to find the better inital guesses for variables and period od the system of ODEs
 
     Parameters
     ----------
-    vars : numpy array or number
-        The value(s) or approximations of the function at either the intial guess
-        or previous step taken.
     tt  :  number
         The target value of t that the funtion will solve up to.
+    sols : numpy array or number
+        The value(s) or approximations of the function from t = 0 to t = tt
     ODE :  function
         Differnetial equation or system of differnetial equations. Defined as a
         function.
-    step_size : number
-        This is the size of the 'step' the euler funtion will approximate using.
-    n : number
-        The number of steps you want to take between the inital value and target
-        value. The more steps (i.e. higher n) the better the approimation will
-        be. n is set to 500 by defult.
-    rk_e : string
-        String '--euler' chooses to compute step using euler method. Otherwise
-        will use 4th order Runge-Kutta method.
     **kwargs : variables
         This may include any additional variables that may be used in the system
         of ODE's.
 
     Returns
     -------
-    t_vals : numpy array
-        This is the array of t values that have been approimated for.
-    sols : numpy array
-        The array of values that have been approimated for each corresponding
-        t value.
+    vars_and_period : numpy array
+        Inital conditons needed to solve the function and period of the function
 
     Examples
     --------
     >>> def ODE(t,x):
-            return np.sin(x)
-    >>> solve_ode(1,1,ODE)
-    (array([0.   , 0.002,......, 1.]), array([1., 1.00168385,
-        ,.......,1.94328858]))
-
+            return np.sin(x**2) - (x**3 - 1)/x
+    >>> vars = np.array([0.1,0.1])
+    >>> tt = 2
+    >>> shooting(tt,vars, ODE)
+    [0.35865757 9.99999983]
     '''
     vars = sols[:-1]
     tt = sols[-1]
-    print('sols', sols, vars)
-    return np.concatenate((integrate(vars, tt, ODE, **kwargs), get_phase_conditon(ODE, vars, **kwargs)))
+    vars_and_period = np.concatenate((integrate(vars, tt, ODE, **kwargs), get_phase_conditon(ODE, vars, **kwargs)))
+    return vars_and_period
+
+def ODE(t,x):
+    return np.sin(x**2) - (x**3 - 1)/x
+vars = np.array([0.1,0.1])
+tt = 2
+print('shoot')
+print(shooting(tt,vars, ODE))
 
 
-
-
-def find_nearest(array, value):
-    '''
-    This runs a for loop that stores all solutions for steps between the target
-    value and the initial value of zero.
-
-    Parameters
-    ----------
-    vars : numpy array or number
-        The value(s) or approximations of the function at either the intial guess
-        or previous step taken.
-    tt  :  number
-        The target value of t that the funtion will solve up to.
-    ODE :  function
-        Differnetial equation or system of differnetial equations. Defined as a
-        function.
-    step_size : number
-        This is the size of the 'step' the euler funtion will approximate using.
-    n : number
-        The number of steps you want to take between the inital value and target
-        value. The more steps (i.e. higher n) the better the approimation will
-        be. n is set to 500 by defult.
-    rk_e : string
-        String '--euler' chooses to compute step using euler method. Otherwise
-        will use 4th order Runge-Kutta method.
-    **kwargs : variables
-        This may include any additional variables that may be used in the system
-        of ODE's.
-
-    Returns
-    -------
-    t_vals : numpy array
-        This is the array of t values that have been approimated for.
-    sols : numpy array
-        The array of values that have been approimated for each corresponding
-        t value.
-
-    Examples
-    --------
-    >>> def ODE(t,x):
-            return np.sin(x)
-    >>> solve_ode(1,1,ODE)
-    (array([0.   , 0.002,......, 1.]), array([1., 1.00168385,
-        ,.......,1.94328858]))
-
-    '''
-    idx = (np.abs(array - value)).argmin()
-    return idx
-
-# newton(t_vals, sols, ODE, t0, np.full(np.shape(vars), 0.01), 1000)
-def newton(t_vals, sols ,Df,t0,epsilon,max_iter,**kwargs):
-    #t_vals = t_vals.asarray()
-    print('here', t_vals)
-    '''Approximate solution of f(x)=0 by Newton's method.
-
-    Parameters
-    ----------
-    f : function
-        Function for which we are searching for a solution f(x)=0.
-    Df : function
-        Derivative of f(x).
-    x0 : number
-        Initial guess for a solution f(x)=0.
-    epsilon : number
-        Stopping criteria is abs(f(x)) < epsilon.
-    max_iter : integer
-        Maximum number of iterations of Newton's method.
-
-    Returns
-    -------
-    xn : number
-        Implement Newton's method: compute the linear approximation
-        of f(x) at xn and find x intercept by the formula
-            x = xn - f(xn)/Df(xn)
-        Continue until abs(f(xn)) < epsilon and return xn.
-        If Df(xn) == 0, return None. If the number of iterations
-        exceeds max_iter, then return None.
-
-    Examples
-    --------
-    >>> f = lambda x: x**2 - x - 1
-    >>> Df = lambda x: 2*x - 1
-    >>> newton(f,Df,1,1e-8,10)
-    Found solution after 5 iterations.
-    1.618033988749989
-    '''
-    tn = t_vals[-1]
-    for n in range(0,max_iter):
-        tn_idx = find_nearest(t_vals, tn)
-        ftn = sols[tn_idx][0]
-        print('the vars', ftn)
-        if np.all(abs(ftn) < epsilon):
-            print('Found solution after',n,'iterations.')
-            return tn
-        Dftn = Df(tn,ftn,**kwargs)
-        print('the derivative ', Dftn)
-        if np.all(Dftn == 0):
-            print('Zero derivative. No solution found.')
-            return None
-        tn = tn - ftn/Dftn
-        print('the t', tn)
-    print('Exceeded maximum iterations. No solution found.')
-    return None
 
 
 
