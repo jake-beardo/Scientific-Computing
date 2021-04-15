@@ -38,6 +38,95 @@ def shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs):
 
 def period_finder(ts, sols):
     '''
+    Guesses the period of a set of solutions to a function.
+
+    Uses the differences in the peaks of a funciton (i.e. when dx/dt = 0) to find the period of ossilation.
+    The function can also guess the period for a data set.
+
+
+    Parameters
+    ----------
+    ts : numpy array
+        The values of t that have been approimated for given our intial guess
+    sols  :  numpy array
+        Solutions to the ode we based on inital guess
+
+    Returns
+    -------
+    ave_period : number
+        The guess for the period of the ode.
+
+    Examples
+    --------
+    >>> ts = np.array([0.1,0.2...,1])
+    >>> sols = np.array([5,0...,5])
+    >>> period_finder(ts, sols)
+    1
+    '''
+    i_count = 0
+    peaks = []
+    for i in sols[1:-1,0]:
+        if i > sols[i_count,0] and i > sols[i_count+2,0]:
+            peaks.append(ts[i_count+1])
+
+        i_count += 1
+    peaks = np.asarray(peaks)
+    peaks = peaks[3:]
+    print('amount of peaks', len(peaks))
+    peak_diffs = np.diff(peaks)
+    ave_period = np.mean(peak_diffs)
+    print('ave_period', ave_period)
+    return ave_period
+
+
+
+
+# specific integrate function to return the difference from vars and the final
+# point for vector sols
+def integrate(vars, tt, ODE, **kwargs):
+    '''
+    This runs a for loop that stores all solutions for steps between the target
+    value and the initial value of zero.
+
+    Parameters
+    ----------
+    vars : numpy array or number
+        The value(s) or approximations of the function at either the intial guess
+        or previous step taken.
+    tt  :  number
+        The target value of t that the funtion will integrate for.
+    ODE :  function
+        Differnetial equation or system of differnetial equations. Defined as a
+        function.
+    **kwargs : variables
+        This may include any additional variables that may be used in the system
+        of ODE's.
+
+    Returns
+    -------
+    t_vals : numpy array
+        This is the array of t values that have been approimated for.
+    sols : numpy array
+        The array of values that have been approimated for each corresponding
+        t value.
+
+    Examples
+    --------
+    >>> def ODE(t,x):
+            return np.sin(x)
+    >>> solve_ode(1,1,ODE)
+    (array([0.   , 0.002,......, 1.]), array([1., 1.00168385,
+        ,.......,1.94328858]))
+
+    '''
+    t_values, sols = solve_ode(vars,tt, ODE, **kwargs)
+    print('inteeeee',sols[-1, :] - vars)
+    return sols[-1, :] - vars
+
+
+# phasecondition: dxdt = 0
+def get_phase_conditon(ODE, vars, **kwargs):
+    '''
     This runs a for loop that stores all solutions for steps between the target
     value and the initial value of zero.
 
@@ -79,38 +168,56 @@ def period_finder(ts, sols):
     >>> solve_ode(1,1,ODE)
     (array([0.   , 0.002,......, 1.]), array([1., 1.00168385,
         ,.......,1.94328858]))
+
     '''
-    i_count = 0
-    peaks = []
-    for i in sols[1:-1,0]:
-        if i > sols[i_count,0] and i > sols[i_count+2,0]:
-            peaks.append(ts[i_count+1])
-
-        i_count += 1
-    peaks = np.asarray(peaks)
-    peaks = peaks[3:]
-    print('amount of peaks', len(peaks))
-    peak_diffs = np.diff(peaks)
-    ave_period = np.mean(peak_diffs)
-    print('ave_period', ave_period)
-    return ave_period
-
-
-
-
-# specific integrate function to return the difference from vars and the final
-# point for vector sols
-def integrate(vars, tt, ODE, **kwargs):
-    t_values, sols = solve_ode(vars,tt, ODE, **kwargs)
-    return sols[-1, :] - vars
-
-
-# phasecondition: dxdt = 0
-def get_phase_conditon(ODE, vars, **kwargs):
     return np.array([ODE(0, vars,**kwargs)[0]])
 
 
 def shooting(tt,sols, ODE, **kwargs):
+    '''
+    This runs a for loop that stores all solutions for steps between the target
+    value and the initial value of zero.
+
+    Parameters
+    ----------
+    vars : numpy array or number
+        The value(s) or approximations of the function at either the intial guess
+        or previous step taken.
+    tt  :  number
+        The target value of t that the funtion will solve up to.
+    ODE :  function
+        Differnetial equation or system of differnetial equations. Defined as a
+        function.
+    step_size : number
+        This is the size of the 'step' the euler funtion will approximate using.
+    n : number
+        The number of steps you want to take between the inital value and target
+        value. The more steps (i.e. higher n) the better the approimation will
+        be. n is set to 500 by defult.
+    rk_e : string
+        String '--euler' chooses to compute step using euler method. Otherwise
+        will use 4th order Runge-Kutta method.
+    **kwargs : variables
+        This may include any additional variables that may be used in the system
+        of ODE's.
+
+    Returns
+    -------
+    t_vals : numpy array
+        This is the array of t values that have been approimated for.
+    sols : numpy array
+        The array of values that have been approimated for each corresponding
+        t value.
+
+    Examples
+    --------
+    >>> def ODE(t,x):
+            return np.sin(x)
+    >>> solve_ode(1,1,ODE)
+    (array([0.   , 0.002,......, 1.]), array([1., 1.00168385,
+        ,.......,1.94328858]))
+
+    '''
     vars = sols[:-1]
     tt = sols[-1]
     print('sols', sols, vars)
@@ -120,6 +227,50 @@ def shooting(tt,sols, ODE, **kwargs):
 
 
 def find_nearest(array, value):
+    '''
+    This runs a for loop that stores all solutions for steps between the target
+    value and the initial value of zero.
+
+    Parameters
+    ----------
+    vars : numpy array or number
+        The value(s) or approximations of the function at either the intial guess
+        or previous step taken.
+    tt  :  number
+        The target value of t that the funtion will solve up to.
+    ODE :  function
+        Differnetial equation or system of differnetial equations. Defined as a
+        function.
+    step_size : number
+        This is the size of the 'step' the euler funtion will approximate using.
+    n : number
+        The number of steps you want to take between the inital value and target
+        value. The more steps (i.e. higher n) the better the approimation will
+        be. n is set to 500 by defult.
+    rk_e : string
+        String '--euler' chooses to compute step using euler method. Otherwise
+        will use 4th order Runge-Kutta method.
+    **kwargs : variables
+        This may include any additional variables that may be used in the system
+        of ODE's.
+
+    Returns
+    -------
+    t_vals : numpy array
+        This is the array of t values that have been approimated for.
+    sols : numpy array
+        The array of values that have been approimated for each corresponding
+        t value.
+
+    Examples
+    --------
+    >>> def ODE(t,x):
+            return np.sin(x)
+    >>> solve_ode(1,1,ODE)
+    (array([0.   , 0.002,......, 1.]), array([1., 1.00168385,
+        ,.......,1.94328858]))
+
+    '''
     idx = (np.abs(array - value)).argmin()
     return idx
 
