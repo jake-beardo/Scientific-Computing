@@ -150,15 +150,7 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
             t += step_size
         sols = rk4(vars, t, ODE, extra_step,**kwargs)
     return sols
-def func2(vars, t_pre,a):
-    return np.array(a*(vars + np.sin(t_pre)))
-def func1(t_pre,vars):
-    return np.array([t_pre*(vars[0]+ np.sin(t_pre*np.pi)), vars[1]+np.sin(t_pre*np.pi)])
-print(solve_to(np.array([-10,-11]), 10, func1, 12,0.001,'--runge'))
 
-'''
-
-'''
 # n is the number of x's wanted between x0 and target solution
 def solve_ode(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     '''
@@ -219,3 +211,21 @@ def solve_ode(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     sols = np.asarray(sols)
     t_vals = np.asarray(t_vals)
     return t_vals, sols
+
+
+def func1(t_pre,vars):
+    return np.array([t_pre*(vars[0]+ np.sin(t_pre*np.pi)), vars[1]+np.sin(t_pre*np.pi)])
+def func2(vars, t_pre,a):
+    return np.array(a*(vars + np.sin(t_pre)))
+def func3(vars,t_pre):
+    return np.array([3*vars[0]+vars[1]-vars[2], vars[0]+2*vars[1]-vars[2], 3*vars[0] +3*vars[1]-vars[2]])
+def func4(t,x):
+    return np.sin(x)
+def hopf(u_vals, t, beta, sigma):
+    return np.array([beta*u_vals[0]-u_vals[1]+sigma*u_vals[0]*(u_vals[0]^2 + u_vals[1]^2),u_vals[0]+beta*u_vals[1]+sigma*u_vals[1]*(u_vals[0]^2 + u_vals[1]^2)])
+np.set_printoptions(threshold=np.inf,suppress=True, )
+# solve_ode(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs)
+#print(solve_ode(np.array([1,1]),1, func1 ,step_size=0.01,n=100, rk_e='--runge'))
+print(solve_ode(np.array([1,1]),2, func1 ,step_size=0.01,n=1000, rk_e='--runge'))
+print(solve_ode(np.array([1,1]),100, func1 ,step_size=0.1,n=500, rk_e='--runge'))
+print(solve_ode(np.array([1,1]),500, func1 ,step_size=0.01,n=500, rk_e='--runge'))

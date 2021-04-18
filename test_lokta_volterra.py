@@ -12,7 +12,10 @@ def lokta(t,vars,a,b,d):
     # # where theta is the phase
 tt = 100
 
-us, period = shooting_main(np.array([1,-1.5]),tt, lokta, 0.01,1000, 'z', a=1,b=0.2, d=0.1)
+# shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs)
+
+us, period = shooting_main(np.array([0.1,0.1]),200, lokta, 0.1,500, '--runge', a=1,b=0.2, d=0.1)
+print(us,period)
 tt = 0
 ''' NEED TO CHANGE THE CONDITIONS '''
 if abs(us[0] - np.sqrt(beta)*np.cos(tt+theta)) < 0.1 and abs(us[1] - np.sqrt(beta)*np.sin(tt+theta)) < 0.1:

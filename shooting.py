@@ -7,7 +7,49 @@ from matplotlib import pyplot as plt
 
 
 def shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs):
+    '''
+    Uses numerical shooting and root finder (fsolve) to find the initial conditons and period of a funciton.
 
+    Will first find solutions to the ode based on inital guess then use this to try improve intial guess.
+    NB: inital guess for dependant variables need to be quite good.
+
+
+    Parameters
+    ----------
+    vars : numpy array or number
+        The value(s) or approximations of the function at either the intial guess or previous step taken.
+    tt  :  number
+        The target value of t that the funtion will solve up to.
+    ODE : function
+        Differnetial equation or system of differnetial equations. Defined as a function.
+    step_size : number
+        This is the size of the 'step' the euler funtion will approximate using e.g it will return the approimation for value(s) of the funtion at
+        t_pre + step_size.
+    n : number
+        The number of steps you want to take between the inital value and target
+        value. The more steps (i.e. higher n) the better the approimation will
+        be. n is set to 500 by defult.
+    rk_e : string
+        String '--euler' chooses to compute step using euler method. Otherwise
+        will use 4th order Runge-Kutta method.
+    **kwargs : variables
+        This may include any additional variables that may be used in the system
+        of ODE's.
+
+    Returns
+    -------
+    vars : numpy array
+        Inital conditions for the dependant variables of the system of ODEs.
+    tt : number
+        Period of the system of ODEs.
+        
+    Examples
+    --------
+    >>> def lokta(t,vars,a,b,d):
+        return np.array([vars[0]*(1-vars[0]) - (a*vars[0]*vars[1])/(d+vars[0]), b*vars[1]*(1 - (vars[1]/vars[0]))])
+    >>> shooting_main(np.array([0.1,0.1]),200, lokta, 0.1,500, '--runge', a=1,b=0.2, d=0.1)
+    [0.10603874 0.18419065] 20.775315952158223
+    '''
     t_vals, sols = solve_ode(vars,tt, ODE, **kwargs)
     plt.plot(t_vals, sols[:,0])
     plt.plot(t_vals, sols[:,1])
