@@ -89,6 +89,7 @@ def rk4(vars, t_pre, ODE, step_size,**kwargs):
 
 
 
+
 def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
     '''
     This is a driver function that will ensure each step is filled between
@@ -130,6 +131,7 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
     1.9562947385102594
     '''
     gap = t2-t0
+
     if gap == 0:
         return vars
     elif step_size % gap == 0:
@@ -150,7 +152,6 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
             t += step_size
         sols = rk4(vars, t, ODE, extra_step,**kwargs)
     return sols
-
 # n is the number of x's wanted between x0 and target solution
 def solve_ode(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     '''
@@ -226,6 +227,6 @@ def hopf(u_vals, t, beta, sigma):
 np.set_printoptions(threshold=np.inf,suppress=True, )
 # solve_ode(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs)
 #print(solve_ode(np.array([1,1]),1, func1 ,step_size=0.01,n=100, rk_e='--runge'))
-print(solve_ode(np.array([1,1]),2, func1 ,step_size=0.01,n=1000, rk_e='--runge'))
-print(solve_ode(np.array([1,1]),100, func1 ,step_size=0.1,n=500, rk_e='--runge'))
-print(solve_ode(np.array([1,1]),500, func1 ,step_size=0.01,n=500, rk_e='--runge'))
+#print(solve_ode(np.array([1,1]),2, func1 ,step_size=0.01,n=1000, rk_e='--runge'))
+#print(solve_ode(np.array([1,1]),100, func1 ,step_size=0.1,n=500, rk_e='--runge'))
+#print(solve_ode(np.array([1,1]),500, func1 ,step_size=0.01,n=500, rk_e='--runge'))

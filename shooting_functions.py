@@ -42,7 +42,7 @@ def shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs):
         Inital conditions for the dependant variables of the system of ODEs.
     tt : number
         Period of the system of ODEs.
-        
+
     Examples
     --------
     >>> def lokta(t,vars,a,b,d):
@@ -57,6 +57,7 @@ def shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs):
     plt.ylabel("x(t),y(t)")
     plt.show()
     period_guess = period_finder(t_vals, sols)
+    print(tt, sols, ODE)
     #sol = newton(t_vals, sols, ODE, t0, np.full(np.shape(vars), 0.01), 1000,**kwargs)
     sol = fsolve(lambda sols, ODE: shooting(tt, sols, ODE, **kwargs), [vars[0], vars[1], period_guess], ODE)
     vars = sol[:-1]
@@ -113,6 +114,11 @@ def period_finder(ts, sols):
 
 # specific integrate function to return the difference from vars and the final
 # point for vector sols
+
+def hopf(t, u_vals, beta, sigma):
+    u1 = beta*u_vals[0]-u_vals[1]+sigma*u_vals[0]*(u_vals[0]**2 + u_vals[1]**2)
+    u2 = u_vals[0]+beta*u_vals[1]+sigma*u_vals[1]*(u_vals[0]**2 + u_vals[1]**2)
+    return np.array([u1,u2])
 def integrate(vars, tt, ODE, **kwargs):
     '''
     Uses solve_ode to find the differnce in final solution values at tt for ode and the intial solutions at t0
@@ -144,15 +150,15 @@ def integrate(vars, tt, ODE, **kwargs):
     >>> integrate(vars, tt, ODE)
     [1.21813282 1.21813282]
     '''
-    t_values, sols = solve_ode(vars,tt, ODE, **kwargs)
-    return sols[-1, :] - vars
+    print('integrate')
+    print(ODE,'vars',vars)
+    print('tt',tt)
 
-def ODE(t,x):
-    return np.sin(x**2) - (x**3 - 1)/x
-vars = np.array([0.1,0.1])
-tt = 2
-print('here')
-print(integrate(vars, tt, ODE))
+    t_values, sols = solve_ode(vars,tt, ODE, **kwargs)
+    print('output ',sols[-1, :] - vars)
+    return sols[-1, :] - vars
+ans = integrate(np.array([0.1,0.1]),6, hopf,beta=0.1, sigma=-1)
+print(ans)
 
 def get_phase_conditon(ODE, vars, **kwargs):
     '''
@@ -183,11 +189,10 @@ def get_phase_conditon(ODE, vars, **kwargs):
     >>> get_phase_conditon(ODE, vars)
     [0.09983342]
     '''
+
     return np.array([ODE(0, vars,**kwargs)[0]])
-def ODE(t,x):
-    return np.sin(x)
-vars = np.array([0.1,0.1])
-print(get_phase_conditon(ODE, vars))
+
+
 
 def shooting(tt,sols, ODE, **kwargs):
     '''
@@ -220,19 +225,23 @@ def shooting(tt,sols, ODE, **kwargs):
     >>> shooting(tt,vars, ODE)
     [0.35865757 9.99999983]
     '''
+    print('sols', sols)
+    print('tt shooting', tt)
     vars = sols[:-1]
     tt = sols[-1]
     vars_and_period = np.concatenate((integrate(vars, tt, ODE, **kwargs), get_phase_conditon(ODE, vars, **kwargs)))
     return vars_and_period
 
-def ODE(t,x):
-    return np.sin(x**2) - (x**3 - 1)/x
-vars = np.array([0.1,0.1])
-tt = 2
-print('shoot')
-print(shooting(tt,vars, ODE))
-
-
+def func1(t_pre,vars):
+    return np.array([t_pre*(vars[0]+ np.sin(t_pre*np.pi)), vars[1]+np.sin(t_pre*np.pi)])
+def func2(vars, t_pre,a):
+    return np.array(a*(vars + np.sin(t_pre)))
+def func3(vars,t_pre):
+    return np.array([3*vars[0]+vars[1]-vars[2], vars[0]+2*vars[1]-vars[2], 3*vars[0] +3*vars[1]-vars[2]])
+def func4(t,x):
+    return np.sin(x)
+def hopf(u_vals, t, beta, sigma):
+    return np.array([beta*u_vals[0]-u_vals[1]+sigma*u_vals[0]*(u_vals[0]^2 + u_vals[1]^2),u_vals[0]+beta*u_vals[1]+sigma*u_vals[1]*(u_vals[0]^2 + u_vals[1]^2)])
 
 
 

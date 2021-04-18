@@ -1,6 +1,6 @@
 ''' TEST LOKTA-VOLTERRA SHOOTING AND PLOTTING '''
 import numpy as np
-from shooting import *
+from shooting_functions import *
 
 
 def lokta(t,vars,a,b,d):
