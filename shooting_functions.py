@@ -60,7 +60,12 @@ def shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs):
     t_vals, sols = solve_ode(vars,tt, ODE, **kwargs)
     period_guess = period_finder(t_vals, sols) # finding good guess for period of ode
     inital_guesses = np.append(vars,period_guess)
-
+    warnings.filterwarnings('error')
+    try:
+        # rooting finding using the shooting method
+        sol = fsolve(lambda sols, ODE: shooting(tt, sols, ODE, **kwargs), inital_guesses, ODE)
+    except RuntimeWarning:
+        raise Exception('The root finder is not able to converge. Please try a different intial condition guesses or different guess for the periodic orbit')
     plt.plot(t_vals, sols[:,0])
     plt.plot(t_vals, sols[:,1])
     plt.xlabel("t")
