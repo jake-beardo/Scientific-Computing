@@ -50,17 +50,22 @@ def shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs):
     >>> shooting_main(np.array([0.1,0.1]),200, lokta, 0.1,500, '--runge', a=1,b=0.2, d=0.1)
     [0.10603874 0.18419065] 20.775315952158223
     '''
+    try:
+        ODE(vars)
+    except IndexError:
+        raise Exception('The dimensions provided from the intial guess given are smaller than the dimensions required for the ODE. Please try a different inital guess with larger dimensions')
+    if np.shape(vars) != np.shape(ODE(vars)):
+        raise Exception('The dimensions provided from the intial guess given are larger than the dimensions required for the ODE. Please try a different inital guess with smaller dimensions')
+    # using solve_ode to approximate solution for ode using inital guesses
     t_vals, sols = solve_ode(vars,tt, ODE, **kwargs)
+    period_guess = period_finder(t_vals, sols) # finding good guess for period of ode
+    inital_guesses = np.append(vars,period_guess)
+
     plt.plot(t_vals, sols[:,0])
     plt.plot(t_vals, sols[:,1])
     plt.xlabel("t")
     plt.ylabel("x(t),y(t)")
     plt.show()
-    period_guess = period_finder(t_vals, sols)
-    print(tt, sols, ODE)
-    #sol = newton(t_vals, sols, ODE, t0, np.full(np.shape(vars), 0.01), 1000,**kwargs)
-    inital_guesses = np.append(vars,period_guess)
-    sol = fsolve(lambda sols, ODE: shooting(tt, sols, ODE, **kwargs), inital_guesses, ODE)
     vars = sol[:-1]
     tt = sol[-1]
     print('U0: ', vars)
@@ -243,12 +248,3 @@ def func4(t,x):
     return np.sin(x)
 def hopf(u_vals, t, beta, sigma):
     return np.array([beta*u_vals[0]-u_vals[1]+sigma*u_vals[0]*(u_vals[0]^2 + u_vals[1]^2),u_vals[0]+beta*u_vals[1]+sigma*u_vals[1]*(u_vals[0]^2 + u_vals[1]^2)])
-
-
-
-
-
-'''
-if __name__ == '__main__':
-    shooting_main([0.1, 0.1], 100, 200, func, 0.01, '--runge', a=1,b=0.2,d=0.1)
-'''
