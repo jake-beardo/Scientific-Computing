@@ -59,7 +59,8 @@ def shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs):
     period_guess = period_finder(t_vals, sols)
     print(tt, sols, ODE)
     #sol = newton(t_vals, sols, ODE, t0, np.full(np.shape(vars), 0.01), 1000,**kwargs)
-    sol = fsolve(lambda sols, ODE: shooting(tt, sols, ODE, **kwargs), [vars[0], vars[1], period_guess], ODE)
+    inital_guesses = np.append(vars,period_guess)
+    sol = fsolve(lambda sols, ODE: shooting(tt, sols, ODE, **kwargs), inital_guesses, ODE)
     vars = sol[:-1]
     tt = sol[-1]
     print('U0: ', vars)
