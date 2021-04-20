@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import sys
+from scipy.integrate import odeint
 
 # ode function needed to solve
 def x_double_dot(vars,t):
@@ -131,7 +132,7 @@ def error_finder(x_sols_array,t_vals_array,sol_x):
 
 #sol = odeint(ODE, x0, delta_t, args=(x,t)
 
-t0,tt = 0,140
+t0,tt = 0,100
 x0 = 1
 y0 = 1
 inits = [x0,y0]
@@ -170,6 +171,16 @@ step_sizes = np.delete(step_sizes, idxs_array)
 for i in range(len(t_vals_array)):
     plt.plot(t_vals_array[i], x_sols_array[i], label="euler")
     plt.plot(t_vals_array[i], x_sols_array_runge[i], label="runge")
+
+
+
+plt.plot(t_vals_array[1], x_sols_array_runge[1], label="RK4 approx")
+
+ts = np.asarray(t_vals_array[1])
+def x_dot(y,t):
+    dx_dt = y
+    return dx_dt
+
 
 
 plt.legend()
