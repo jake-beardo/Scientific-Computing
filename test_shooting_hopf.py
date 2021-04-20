@@ -13,6 +13,12 @@ beta = 0.1
 tt = 100
 
 us, period = shooting_main(np.array([0.1,0.1]),tt, hopf, 0.01,1000, 'z', beta=beta, sigma=-1)
+t_vals, sols = solve_ode(us,tt, hopf, beta=beta, sigma=-1)
+plt.plot(t_vals, sols[:,0])
+plt.plot(t_vals, sols[:,1])
+plt.xlabel("t")
+plt.ylabel("x(t),y(t)")
+plt.show()
 theta = period
 u_1= np.sqrt(beta)*np.cos(theta)
 u_2 = np.sqrt(beta)*np.sin(theta)
