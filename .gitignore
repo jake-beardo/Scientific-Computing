@@ -1,4 +1,16 @@
 
+
 .DS_Store
 .DS_Store
 *.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*~
+
+*.DStore
+.DS_Store
+*.pyc
+*.pyc
+__pycache__/solver_functions.cpython-38.pyc
