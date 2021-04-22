@@ -23,30 +23,26 @@ def hopf(t, u_vals, beta, sigma):
 # i.e. ODE(0,0,**kwargs) = 0
 
 if __name__ == "__main__":
-
-    x0s = np.linspace(0.1,0.3,10)
-    y0s = np.linspace(0.1,0.3,10)
-    sols = []
-    n = 500
-    '''
-    for x0 in x0s:
-        for y0 in y0s:
-    '''
+    #
+    # x0s = np.linspace(0.1,0.3,10)
+    # y0s = np.linspace(0.1,0.3,10)
+    # sols = []
+    #
+    # for x0 in x0s:
+    #     for y0 in y0s:
+    # variables required for the funtion
     a = 1
     d = 0.1
     b = 0.2
 
-    t0 = 0
-    tt = 200
-    step_size =  0.01
-
-    ODE = hopf
-    # main(t0,tt,x0,y0,ODE, deltat_max, step_sizes)
-    # solve_ode(vars,t0,tt, ODE,step_size,n, rk_e, **kwargs)
+    tt = 200 # target t value you wish to solve for
+    ODE = hopf # ODE you wish to solve for
 
 
-    #t_vals, sols = solve_ode([1,1],t0,tt, ODE, step_size, 1000, 0.1, a=1,b=b,d=0.1)
-    t_vals, sols = solve_ode([1,1],tt, ODE, step_size, 1000, 0.1, beta=1,sigma=-1 )
+    inital_conditions, period = shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs)
+    t_vals, sols = solve_ode(np.array([1,1]),tt, ODE, step_size, 1000, 0.1, beta=1,sigma=-1 )
+
+
 
     print(t_vals, sols)
     plt.plot(t_vals, sols[:,0])

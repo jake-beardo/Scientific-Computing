@@ -131,7 +131,7 @@ def solve_to(vars,t0,ODE, t2,step_size,rk_e,**kwargs):
     1.9562947385102594
     '''
     gap = t2-t0
-
+    # added this in incase no step was given
     if gap == 0:
         return vars
     elif step_size % gap == 0:

@@ -36,3 +36,23 @@ Also, when we plot a birification diagram/phase portrait we witness a spiral whe
 Format: ![Alt Text](url)
 
 We can also plot the last values for predator and prey against different values of b as shown below. This plot shows us that b < 0.26 is unstable and beyond that the population becomes stable.
+
+**The initial software**
+
+The initial task in the development of this software was to implement a simple Euler method step for a first order ODE. This was easily done with input of the initial dependant(x0) and independent variables(t0), an arbitrary step size and the ODE you want to solve for. This function then outputs its guess for the solution to the ODE at t1(t0 + step_size) to be x1.
+
+The next step required to take was producing an array of solutions between two values. I made a solve_to function to split the two values into equally spaced steps this is to create an accurate array of approximations between the two values. The solve_to driver function found all the steps between each approximation and returned only the final step. As a result if the user provided a smaller step size the approximation was likely to be more accurate as a result of the work going on inside this function. The use of this enables the user to choose whether they was quick and less accurate approximation or slow and highly accurate ones.
+
+The next function needed was a function called solve_ode that uses solve_to and euler_step and stores the approximations between the initial t and the target value of t. This was a useful way to plot the function and is what the user is likely to use most. To begin with I had many different variables being initialised at the start of the code and then adding these to arrays afterwards causing the code for this function to be quite long and less eloquent. I decided to instead initialise arrays with these variables already in them and use indexing of the arrays to make the code a lot sorter and easier to understand. 
+
+**Decisions I made along the way**
+From early on I realised I needed to
+
+*Talk about modularising code early on*
+
+
+**Learning log**
+
+When making the solve_to function I needed to split the independent variable values up evenly. However, it was often the case that the difference between the t values needed to approximate for didn't divide into a whole number for the amount of steps needed. To overcome this I divided as I needed then converted the number of steps into an integer and then added an  extra step to fill the rest of the space needed for the approximation.
+
+I also noticed that if the user inputed that it wanted to approximate for t=0 the function would produce an error due to division by 0. Hence, I added an if statement to handle this.

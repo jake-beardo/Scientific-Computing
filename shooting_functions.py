@@ -6,7 +6,7 @@ from main import func
 from matplotlib import pyplot as plt
 
 
-def shooting_main(vars,tt, ODE, step_size,n, rk_e, **kwargs):
+def shooting_main(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     '''
     Uses numerical shooting and root finder (fsolve) to find the initial conditons and period of a funciton.
 
