@@ -14,3 +14,5 @@ __pycache__/
 *.pyc
 *.pyc
 __pycache__/solver_functions.cpython-38.pyc
+.DS_Store
+.DS_Store
