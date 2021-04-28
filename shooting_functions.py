@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.optimize  import fsolve
 from scipy.integrate import solve_ivp
-from solver_functions import *
+from solver_functions import solve_ode, solve_to, euler_step, rk4
 from main import func
 from matplotlib import pyplot as plt
 
