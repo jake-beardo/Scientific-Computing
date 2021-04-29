@@ -3,19 +3,37 @@ import numpy as np
 from shooting_functions import *
 from continuation_functions import *
 
-def hopf(t, u_vals, beta, sigma):
-    u1 = beta*u_vals[0]-u_vals[1]+sigma*u_vals[0]*(u_vals[0]**2 + u_vals[1]**2)
-    u2 = u_vals[0]+beta*u_vals[1]+sigma*u_vals[1]*(u_vals[0]**2 + u_vals[1]**2)
+
+def alge(t,x,c):
+    return x**3 - x + c
+
+def hopf_normal(t, u_vals, beta, sigma):
+    u1 = beta*u_vals[0]-u_vals[1]+u_vals[0]*(u_vals[0]**2 + u_vals[1]**2)
+    u2 = u_vals[0]+beta*u_vals[1]+u_vals[1]*(u_vals[0]**2 + u_vals[1]**2)
     return np.array([u1,u2])
+
+# ^^ vary beta between 0 and 2
+
+def hopf_mod(t, u_vals, beta, sigma):
+    u1 = beta*u_vals[0]-u_vals[1]+u_vals[1]*(u_vals[0]**2 + u_vals[1]**2)-u_vals[0]*((u_vals[0]**2 + u_vals[1]**2)**2)
+    u2 = u_vals[0]+beta*u_vals[1]+u_vals[1]*(u_vals[0]**2 + u_vals[1]**2)-u_vals[1]*((u_vals[0]**2 + u_vals[1]**2)**2)
+    return np.array([u1,u2])
+# ^^ vary beta between -1 and 2
+
 
 
     # # where theta is the phase
 beta = 0.1
 tt = 100
 
+
+# The discretisation case
+continuation_natural(np.array([0.1,0.1]), tt, hopf , 'c',discretisation=lambda x: x**3 - x + c, param_step_size=0.1, param_from=-2,param_to=2, step_size=0.01,n=500, rk_e='--runge')
+
+
 # continuation_main(init_guess, tt, ODE, init_param, param_step_size=0.1, num_param_guesses=10, step_size=0.01,n=500, rk_e='--runge', **kwargs):
 
-continuation_main(np.array([0.1,0.1]), tt, hopf , 'sigma', param_step_size=0.1, num_param_guesses=10, step_size=0.01,n=500, rk_e='--runge', beta=beta, sigma=-1)
+continuation_natural(np.array([0.1,0.1]), tt, hopf , 'sigma', param_step_size=0.1, param_from=-1,param_to=2,step_size=0.01,n=500, rk_e='--runge', beta=beta, sigma=-1)
 t_vals, sols = solve_ode(us,tt, hopf, beta=beta, sigma=-1)
 plt.plot(t_vals, sols[:,0])
 plt.plot(t_vals, sols[:,1])

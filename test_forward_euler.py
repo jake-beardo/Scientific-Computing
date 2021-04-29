@@ -19,7 +19,17 @@ def u_exact(x,t):
 mx = 10     # number of gridpoints in space
 mt = 1000   # number of gridpoints in time
 
+# Set up the numerical environment variables
+x = np.linspace(0, L, mx+1)     # mesh points in space
+t = np.linspace(0, T, mt+1)     # mesh points in time
+deltax = x[1] - x[0]            # gridspacing in x
+deltat = t[1] - t[0]            # gridspacing in t
+lmbda = kappa*deltat/(deltax**2)    # mesh fourier number
+print("deltax=",deltax)
+print("deltat=",deltat)
+print("lambda=",lmbda)
 
+u_j,x = forward_euler(lmbda,x,mx,mt)
 
 # Plot the final result and exact solution
 pl.plot(x,u_j,'ro',label='num')
