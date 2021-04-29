@@ -4,6 +4,7 @@ from scipy.integrate import solve_ivp
 from solver_functions import solve_ode, solve_to, euler_step, rk4
 from main import func
 from matplotlib import pyplot as plt
+import warnings
 
 
 def shooting_main(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
@@ -51,10 +52,10 @@ def shooting_main(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     [0.10603874 0.18419065] 20.775315952158223
     '''
     try:
-        ODE(vars)
+        ODE(tt,vars,**kwargs)
     except IndexError:
         raise Exception('The dimensions provided from the intial guess given are smaller than the dimensions required for the ODE. Please try a different inital guess with larger dimensions')
-    if np.shape(vars) != np.shape(ODE(vars)):
+    if np.shape(vars) != np.shape(ODE(tt,vars,**kwargs)):
         raise Exception('The dimensions provided from the intial guess given are larger than the dimensions required for the ODE. Please try a different inital guess with smaller dimensions')
     # using solve_ode to approximate solution for ode using inital guesses
     t_vals, sols = solve_ode(vars,tt, ODE, **kwargs)
@@ -66,11 +67,11 @@ def shooting_main(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
         sol = fsolve(lambda sols, ODE: shooting(tt, sols, ODE, **kwargs), inital_guesses, ODE)
     except RuntimeWarning:
         raise Exception('The root finder is not able to converge. Please try a different intial condition guesses or different guess for the periodic orbit')
-    plt.plot(t_vals, sols[:,0])
-    plt.plot(t_vals, sols[:,1])
-    plt.xlabel("t")
-    plt.ylabel("x(t),y(t)")
-    plt.show()
+    # plt.plot(t_vals, sols[:,0])
+    # plt.plot(t_vals, sols[:,1])
+    # plt.xlabel("t")
+    # plt.ylabel("x(t),y(t)")
+    # plt.show()
     vars = sol[:-1]
     tt = sol[-1]
     print('U0: ', vars)
@@ -114,10 +115,8 @@ def period_finder(ts, sols):
         i_count += 1
     peaks = np.asarray(peaks)
     peaks = peaks[3:]
-    print('amount of peaks', len(peaks))
     peak_diffs = np.diff(peaks)
     ave_period = np.mean(peak_diffs)
-    print('ave_period', ave_period)
     return ave_period
 
 
@@ -161,15 +160,9 @@ def integrate(vars, tt, ODE, **kwargs):
     >>> integrate(vars, tt, ODE)
     [1.21813282 1.21813282]
     '''
-    print('integrate')
-    print(ODE,'vars',vars)
-    print('tt',tt)
 
     t_values, sols = solve_ode(vars,tt, ODE, **kwargs)
-    print('output ',sols[-1, :] - vars)
     return sols[-1, :] - vars
-ans = integrate(np.array([0.1,0.1]),6, hopf,beta=0.1, sigma=-1)
-print(ans)
 
 def get_phase_conditon(ODE, vars, **kwargs):
     '''
@@ -236,8 +229,7 @@ def shooting(tt,sols, ODE, **kwargs):
     >>> shooting(tt,vars, ODE)
     [0.35865757 9.99999983]
     '''
-    print('sols', sols)
-    print('tt shooting', tt)
+
     vars = sols[:-1]
     tt = sols[-1]
     vars_and_period = np.concatenate((integrate(vars, tt, ODE, **kwargs), get_phase_conditon(ODE, vars, **kwargs)))
