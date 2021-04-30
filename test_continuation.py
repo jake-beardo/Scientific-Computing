@@ -1,7 +1,7 @@
 ''' Simple test script for the continuation method '''
 import numpy as np
 from shooting_functions import *
-from continuation_functions import *
+from continuation_functions import continuation_natural
 
 
 def alge(t,x,c):
@@ -28,12 +28,12 @@ tt = 100
 
 
 # The discretisation case
-continuation_natural(np.array([0.1,0.1]), tt, hopf , 'c',discretisation=lambda x: x**3 - x + c, param_step_size=0.1, param_from=-2,param_to=2, step_size=0.01,n=500, rk_e='--runge')
+continuation_natural(np.array([0.1,0.1]), tt, hopf , 'c',discretisation=lambda t,x,c: x**3 - x + c, param_step_size=0.1, param_from=-2,param_to=2, step_size=0.01,n=500, rk_e='--euler')
 
 
 # continuation_main(init_guess, tt, ODE, init_param, param_step_size=0.1, num_param_guesses=10, step_size=0.01,n=500, rk_e='--runge', **kwargs):
 
-continuation_natural(np.array([0.1,0.1]), tt, hopf , 'sigma', param_step_size=0.1, param_from=-1,param_to=2,step_size=0.01,n=500, rk_e='--runge', beta=beta, sigma=-1)
+continuation_natural(np.array([0.1,0.1]), tt, hopf , 'beta', param_step_size=0.1, param_from=-1,param_to=2,step_size=0.01,n=500, rk_e='--runge', beta=beta)
 t_vals, sols = solve_ode(us,tt, hopf, beta=beta, sigma=-1)
 plt.plot(t_vals, sols[:,0])
 plt.plot(t_vals, sols[:,1])

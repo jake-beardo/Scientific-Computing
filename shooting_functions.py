@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 import warnings
 
 
-def shooting_main(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
+def shooting(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     '''
     Uses numerical shooting and root finder (fsolve) to find the initial conditons and period of a funciton.
 
@@ -48,7 +48,7 @@ def shooting_main(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     --------
     >>> def lokta(t,vars,a,b,d):
         return np.array([vars[0]*(1-vars[0]) - (a*vars[0]*vars[1])/(d+vars[0]), b*vars[1]*(1 - (vars[1]/vars[0]))])
-    >>> shooting_main(np.array([0.1,0.1]),200, lokta, 0.1,500, '--runge', a=1,b=0.2, d=0.1)
+    >>> shooting(np.array([0.1,0.1]),200, lokta, 0.1,500, '--runge', a=1,b=0.2, d=0.1)
     [0.10603874 0.18419065] 20.775315952158223
     '''
     try:
@@ -198,7 +198,7 @@ def get_phase_conditon(ODE, vars, **kwargs):
 
 
 
-def shooting(tt,sols, ODE, **kwargs):
+def shoot(tt,sols, ODE, **kwargs):
     '''
     Uses the get_phase_conditon and integrate function to find the better inital guesses for variables and period od the system of ODEs
 
@@ -226,7 +226,7 @@ def shooting(tt,sols, ODE, **kwargs):
             return np.sin(x**2) - (x**3 - 1)/x
     >>> vars = np.array([0.1,0.1])
     >>> tt = 2
-    >>> shooting(tt,vars, ODE)
+    >>> shoot(tt,vars, ODE)
     [0.35865757 9.99999983]
     '''
 
