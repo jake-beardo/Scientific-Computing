@@ -3,10 +3,6 @@ import numpy as np
 from shooting_functions import *
 from continuation_functions import continuation_natural
 
-
-def alge(t,x,c):
-    return x**3 - x + c
-
 def hopf_normal(t, u_vals, beta, sigma):
     u1 = beta*u_vals[0]-u_vals[1]+u_vals[0]*(u_vals[0]**2 + u_vals[1]**2)
     u2 = u_vals[0]+beta*u_vals[1]+u_vals[1]*(u_vals[0]**2 + u_vals[1]**2)
