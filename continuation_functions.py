@@ -16,6 +16,7 @@ def continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, 
         # vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs
         if discretisation==shooting:
             init_guess, period = shooting(init_guess, tt, ODE, step_size=0.01,n=500, rk_e='--runge', **kwargs)
+
         else:
             # lambda x: x**3 - x + c
             # do something different here
@@ -23,7 +24,10 @@ def continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, 
             param = param_from
             param_from += step_size
             t_vals, sols = solve_ode(init_guess,tt, discretisation,step_size,n, rk_e, c=param_from)
+            print('sols',sols)
+            print(init_guess)
             roots = fsolve(discretisation(t_vals,sols,param_from),init_guess)
+
             print(roots, 'roots at ', param_from)
 
         found_inits = np.append(found_inits,np.array([init_guess]),axis=0)

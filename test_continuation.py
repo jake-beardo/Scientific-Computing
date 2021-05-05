@@ -21,13 +21,19 @@ def hopf_mod(t, u_vals, beta, sigma):
     # # where theta is the phase
 beta = 0.1
 tt = 100
+print((lambda t,x,c: x**3 - x + c)(100,2,0))
+def func(t,x,c):
+    return (x**3) - x + c
+
 
 
 # The discretisation case
-continuation_natural(np.array([0.1,0.1]), tt, hopf , 'c',discretisation=lambda t,x,c: x**3 - x + c, param_step_size=0.1, param_from=-2,param_to=2, step_size=0.01,n=500, rk_e='--euler')
+continuation_natural(np.array([0.1,0.1]), tt, hopf , 'c',discretisation=func, param_step_size=0.1, param_from=-2,param_to=2, step_size=0.01,n=500, rk_e='--euler')
+
+continuation_natural(np.array([0.1,0.1]), tt, hopf , 'c',discretisation=(lambda t,x,c: x**3 - x + c), param_step_size=0.1, param_from=-2,param_to=2, step_size=0.01,n=500, rk_e='--euler')
 
 
-# continuation_main(init_guess, tt, ODE, init_param, param_step_size=0.1, num_param_guesses=10, step_size=0.01,n=500, rk_e='--runge', **kwargs):
+# continuation_main(init_guess, tt, ODE, init_param, param_step_size=0.1, num_param_guesses=10, step_size=0.01,n=500, rk_e='--runge', **kwargs):
 
 continuation_natural(np.array([0.1,0.1]), tt, hopf , 'beta', param_step_size=0.1, param_from=-1,param_to=2,step_size=0.01,n=500, rk_e='--runge', beta=beta)
 t_vals, sols = solve_ode(us,tt, hopf, beta=beta, sigma=-1)
