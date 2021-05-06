@@ -4,7 +4,7 @@ import numpy as np
 import pylab as pl
 from math import pi
 import matplotlib.pyplot as plt
-from pde_solver_functions import forward_euler
+from pde_solver_functions import pde_solver
 # Set problem parameters/functions
 kappa = 1.0   # diffusion constant
 L=1.0         # length of spatial domain
@@ -24,7 +24,7 @@ def u_exact(x,t):
 mx = 10     # number of gridpoints in space
 mt = 1000   # number of gridpoints in time
 
-bound_conds = np.array([1,4])
+
 
 # Set up the numerical environment variables
 x = np.linspace(0, L, mx+1)     # mesh points in space
@@ -36,8 +36,10 @@ print("deltax=",deltax)
 print("deltat=",deltat)
 print("lambda=",lmbda)
 
+bound_conds = np.array([1,4])
+method = 'backward euler'
 method = 'crank nicholson'
-u_j,x = forward_euler(u_I,lmbda,x,mx,mt,bound_conds,method)
+u_j,x = pde_solver(u_I,lmbda,x,mx,mt,bound_conds,method)
 
 # Plot the final result and exact solution
 pl.plot(x,u_j,'ro',label='num')
