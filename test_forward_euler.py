@@ -1,11 +1,16 @@
 ''' test forward euler '''
 
-
+import numpy as np
+import pylab as pl
+from math import pi
+import matplotlib.pyplot as plt
+from pde_solver_functions import forward_euler
 # Set problem parameters/functions
 kappa = 1.0   # diffusion constant
 L=1.0         # length of spatial domain
 T=0.5         # total time to solve for
 def u_I(x):
+
     # initial temperature distribution
     y = np.sin(pi*x/L)
     return y
@@ -19,6 +24,8 @@ def u_exact(x,t):
 mx = 10     # number of gridpoints in space
 mt = 1000   # number of gridpoints in time
 
+bound_conds = np.array([1,4])
+
 # Set up the numerical environment variables
 x = np.linspace(0, L, mx+1)     # mesh points in space
 t = np.linspace(0, T, mt+1)     # mesh points in time
@@ -29,7 +36,8 @@ print("deltax=",deltax)
 print("deltat=",deltat)
 print("lambda=",lmbda)
 
-u_j,x = forward_euler(lmbda,x,mx,mt)
+method = 'crank nicholson'
+u_j,x = forward_euler(u_I,lmbda,x,mx,mt,bound_conds,method)
 
 # Plot the final result and exact solution
 pl.plot(x,u_j,'ro',label='num')
