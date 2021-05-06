@@ -27,7 +27,14 @@ def pde_solver(u_I,lmbda,x,mx,mt,bound_conds=np.array([0,0]), method='forward eu
         if method == 'forward euler':
             A_diag = np.diag([1-2*lmbda]*(mx-1))+np.diag([lmbda]*(mx-2),-1) + np.diag([lmbda]*(mx-2),1)
             u_jp1[1:mx] = A_diag@u_j[1:mx] + lmbda*b_jp1[1:mx]
+        elif method == 'backward euler':
+            A_diag = np.diag([1+2*lmbda]*(mx-1))+np.diag([lmbda]*(mx-2),-1) + np.diag([lmbda]*(mx-2),1)
+            u_jp1[1:mx] = np.linalg.solve(A_diag@u_j[1:mx] + lmbda*b_jp1[1:mx])
 
+        elif method == 'crank nicholson':
+            A = np.diag([1*lmbda]*(mx-1))+np.diag([-lmbda/2]*(mx-2),-1) + np.diag([-lmbda/2]*(mx-2),1)
+            B = np.diag([1*lmbda]*(mx-1))+np.diag([lmbda/2]*(mx-2),-1) + np.diag([lmbda/2]*(mx-2),1)
+            u_jp1[1:mx] = np.linalg.solve(A, (B @ (u_j[1:mx] + lmbda*b_jp1[1:mx])))
         print(A_diag)
         print(A_diag.shape)
 
