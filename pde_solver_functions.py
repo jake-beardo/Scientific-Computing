@@ -9,7 +9,7 @@ import numpy as np
 import pylab as pl
 from math import pi
 
-def pde_solver(u_I,lmbda,x,mx,mt,bound_conds=np.array([0,0]), method='forward euler'):
+def pde_solver(u_I,lmbda,x,mx,mt,bound_conds=np.array([0,0]), method='forward euler', type_bc='normal'):
     # Set up the solution variables
     u_j = np.zeros(x.size)        # u at current time step
     u_jp1 = np.zeros(x.size)      # u at next time step

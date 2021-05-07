@@ -5,8 +5,10 @@ from shooting_functions import shooting, shoot, integrate, get_phase_conditon,pe
 from main import func
 from matplotlib import pyplot as plt
 
+
 def continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, param_step_size=0.1, param_from=0,param_to=2, step_size=0.01,n=500, rk_e='--runge', **kwargs):
     found_inits = np.array(np.array([init_guess]))
+    kwargs[init_param]=param_from
     #  it simply increments the a parameter by a set amount and attempts to find
     #  the solution for the new parameter value using the last found solution as an initial guess.
     number_of_steps = ((param_to-param_from)/param_step_size)
@@ -16,21 +18,12 @@ def continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, 
         # vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs
         if discretisation==shooting:
             init_guess, period = shooting(init_guess, tt, ODE, step_size=0.01,n=500, rk_e='--runge', **kwargs)
-
         else:
-            # lambda x: x**3 - x + c
-            # do something different here
-            #solve_ode(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs)
-            param = param_from
-            param_from += step_size
-            t_vals, sols = solve_ode(init_guess,tt, discretisation,step_size,n, rk_e, c=param_from)
-            print('sols',sols)
-            print(init_guess)
-            roots = fsolve(discretisation(t_vals,sols,param_from),init_guess)
+            init_guess = fsolve(ODE,init_guess,args=kwargs[init_param])
+        param_from += param_step_size
+        kwargs[init_param]=param_from
 
-            print(roots, 'roots at ', param_from)
+        found_inits = np.append(found_inits, init_guess)
 
-        found_inits = np.append(found_inits,np.array([init_guess]),axis=0)
-        print('found',found_inits)
-        kwargs[init_param] += param_step_size
+    print(found_inits)
     return found_inits

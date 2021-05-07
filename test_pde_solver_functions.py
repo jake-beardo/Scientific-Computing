@@ -39,7 +39,8 @@ print("lambda=",lmbda)
 bound_conds = np.array([1,4])
 method = 'backward euler'
 method = 'crank nicholson'
-u_j,x = pde_solver(u_I,lmbda,x,mx,mt,bound_conds,method)
+type_bc = 'derivative'
+u_j,x = pde_solver(u_I,lmbda,x,mx,mt,bound_conds,method,type_bc)
 
 # Plot the final result and exact solution
 pl.plot(x,u_j,'ro',label='num')
