@@ -1312,11 +1312,11 @@ class Test_solver_functions(unittest.TestCase):
 
 
 
-    def test_shooting(self):
+    def test_shoot(self):
         print('testing shooting')
-        result = shooting_functions.shooting(200,np.array([ 0.1, 0.1, 20.8]), self.lokta,a=1,b=0.2, d=0.1)
+        result = shooting_functions.shoot(200,np.array([ 0.1, 0.1, 20.8]), self.lokta,a=1,b=0.2, d=0.1)
         self.assertIsNone(np.testing.assert_array_almost_equal(result,np.array([0.00538048 ,0.05375487, 0.04      ]),decimal=2))
-        result = shooting_functions.shooting(100,np.array([0.1,  0.1 ,6.28333333]), self.hopf,beta=0.1, sigma=-1)
+        result = shooting_functions.shootc(100,np.array([0.1,  0.1 ,6.28333333]), self.hopf,beta=0.1, sigma=-1)
         self.assertIsNone(np.testing.assert_array_almost_equal(result,np.array([ 0.05105591, 0.05494685, -0.092]),decimal=2))
 
     def test_get_phase_condition(self):
@@ -1334,5 +1334,6 @@ class Test_solver_functions(unittest.TestCase):
         self.assertIsNone(np.testing.assert_array_almost_equal(result,np.array([0.08554999, 0.00481771]),decimal=2))
         result = shooting_functions.integrate(np.array([0.10603874,0.18419065]),20.775315952158223, self.lokta,a=1,b=0.2, d=0.1)
         self.assertIsNone(np.testing.assert_array_almost_equal(result,np.array([0., 0.]),decimal=2))
+
 if __name__ == '__main__':
     unittest.main()
