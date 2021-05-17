@@ -64,7 +64,7 @@ def shooting(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     warnings.filterwarnings('error')
     try:
         # rooting finding using the shooting method
-        sol = fsolve(lambda sols, ODE: shooting(tt, sols, ODE, **kwargs), inital_guesses, ODE)
+        sol = fsolve(lambda sols, ODE: shoot(tt, sols, ODE, **kwargs), inital_guesses, ODE)
     except RuntimeWarning:
         raise Exception('The root finder is not able to converge. Please try a different intial condition guesses or different guess for the periodic orbit')
     # plt.plot(t_vals, sols[:,0])
