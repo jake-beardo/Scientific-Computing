@@ -32,12 +32,12 @@ def func(x,c):
 # The discretisation case
 #continuation_natural(np.array([0.1,0.1]), tt, hopf , 'c',discretisation=func, param_step_size=0.1, param_from=-2,param_to=2, step_size=0.01,n=500, rk_e='--euler')
 
-#continuation_natural(-1, tt, func , 'c', param_step_size=0.1, param_from=-2,param_to=2, step_size=0.01,n=500, rk_e='--euler')
+print(continuation_natural(-1, tt, func , 'c', param_step_size=0.1, param_from=-2,param_to=2, step_size=0.01,n=500, rk_e='--euler'))
 
 
 # continuation_main(init_guess, tt, ODE, init_param, param_step_size=0.1, num_param_guesses=10, step_size=0.01,n=500, rk_e='--runge', **kwargs):
 
-continuation_natural(np.array([0.1,0.1]), tt, hopf_mod , 'beta',discretisation=shooting, param_step_size=0.1, param_from=-1,param_to=2,step_size=0.01,n=500, rk_e='--runge', beta=beta)
+# print(continuation_natural(np.array([0.1,0.1]), tt, hopf_mod , 'beta',discretisation=shooting, param_step_size=0.1, param_from=-1,param_to=2,step_size=0.01,n=500, rk_e='--runge', beta=beta))
 # t_vals, sols = solve_ode(us,tt, hopf, beta=beta, sigma=-1)
 # plt.plot(t_vals, sols[:,0])
 # plt.plot(t_vals, sols[:,1])

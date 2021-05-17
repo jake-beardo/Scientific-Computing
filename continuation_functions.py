@@ -7,6 +7,44 @@ from matplotlib import pyplot as plt
 
 
 def continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, param_step_size=0.1, param_from=0,param_to=2, step_size=0.01,n=500, rk_e='--runge', **kwargs):
+    '''
+    Varies through a given parameter 'init_param' and finds the inital conditions from param_from to param_to finding all param_step_size's inbetween.
+
+    Depending on the discretisation given the funtion can use natural parameter discretisation or numerical shooting.
+
+    Parameters
+    ----------
+    init_guess : number/numpy array
+        The inital guess for the intial conditons of the function you are doing natual parameter continuation for
+    tt  :  number
+        The target value of t that the funtion will solve up to
+    ODE :   function
+        Differnetial equation or system of differnetial equations. Defined as a function.
+    init_param  :   string
+        The parameter chosen to do natural parameter continuation for.
+    discretisation  :   Boolean/function
+        The method you wish to use for natural parameter continuation. Either natural parameter discretisation or numerical shooting.
+    param_step_size :   number
+        The step size of how much the parameter will change by
+    param_from  :   number
+        The starting condition of the parameter
+    param_to    :   number
+        The final value of the parameter you wish to solve for
+
+    Returns
+    -------
+    found_inits : number/numpy array
+        The inital conditons for the function at all of the values of the parameter varied over
+
+    Examples
+    --------
+    >>> def hopf_mod(t, u_vals, beta):
+        u1 = beta*u_vals[0]-u_vals[1]+u_vals[1]*(u_vals[0]**2 + u_vals[1]**2)-u_vals[0]*((u_vals[0]**2 + u_vals[1]**2)**2)
+        u2 = u_vals[0]+beta*u_vals[1]+u_vals[1]*(u_vals[0]**2 + u_vals[1]**2)-u_vals[1]*((u_vals[0]**2 + u_vals[1]**2)**2)
+        return np.array([u1,u2])
+    >>> continuation_natural(np.array([0.1,0.1]), 100, hopf_mod , 'beta',discretisation=shooting, param_step_size=0.1, param_from=-1,param_to=2,step_size=0.01,n=500, rk_e='--runge', beta=0.1)
+    
+    '''
     found_inits = np.array(np.array([init_guess]))
     kwargs[init_param]=param_from
     #  it simply increments the a parameter by a set amount and attempts to find
@@ -25,5 +63,4 @@ def continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, 
 
         found_inits = np.append(found_inits, init_guess)
 
-    print(found_inits)
     return found_inits
