@@ -10,7 +10,6 @@ kappa = 1.0   # diffusion constant
 L=1.0         # length of spatial domain
 T=0.5         # total time to solve for
 def u_I(x):
-
     # initial temperature distribution
     y = np.sin(pi*x/L)
     return y
@@ -39,7 +38,8 @@ print("lambda=",lmbda)
 bound_conds = np.array([1,4])
 method = 'backward euler'
 method = 'crank nicholson'
-type_bc = 'derivative'
+method = 'forward euler'
+type_bc = 'Neumann'
 u_j,x = pde_solver(u_I,lmbda,x,mx,mt,bound_conds,method,type_bc)
 
 # Plot the final result and exact solution
