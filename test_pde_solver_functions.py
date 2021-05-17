@@ -4,7 +4,8 @@ import numpy as np
 import pylab as pl
 from math import pi
 import matplotlib.pyplot as plt
-from pde_solver_functions import pde_solver
+from pde_solver_functions import pde_solver, forward, backward, crank
+
 # Set problem parameters/functions
 kappa = 1.0   # diffusion constant
 L=1.0         # length of spatial domain
@@ -35,11 +36,20 @@ print("deltax=",deltax)
 print("deltat=",deltat)
 print("lambda=",lmbda)
 
-bound_conds = np.array([1,4])
-method = 'backward euler'
-method = 'crank nicholson'
-method = 'forward euler'
+
+# These are the boundary condition functions
+def p_func(t):
+    return np.sin(t)
+
+def q_func(t):
+    return 0
+
+
+method=backward
+method=crank
+method=crank
 type_bc = 'Neumann'
+bound_conds = np.array([p_func,q_func])
 u_j,x = pde_solver(u_I,lmbda,x,mx,mt,bound_conds,method,type_bc)
 
 # Plot the final result and exact solution
