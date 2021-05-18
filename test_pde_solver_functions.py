@@ -50,7 +50,7 @@ method=crank
 method=crank
 type_bc = 'periodic'
 bound_conds = np.array([p_func,q_func])
-u_j,x = pde_solver(u_I,lmbda,x,mx,mt,bound_conds,method,type_bc)
+u_j,x,steady_state = pde_solver(u_I,lmbda,x,mx,mt,bound_conds,method,type_bc)
 
 # Plot the final result and exact solution
 pl.plot(x,u_j,'ro',label='num')

@@ -103,13 +103,18 @@ def crank(u_j,u_jp1,lmbda,x,mx,b_jp1, type_bc):
     return u_jp1
 
 
-
+def pde_steady_states(u_j,u_jp1,time):
+    if np.allclose(u_j, u_jp1):
+        return time
+    else:
+        return np.nan
 
 def pde_solver(u_I,lmbda,x,mx,mt,bound_conds, method=forward, type_bc='Dirichlet'):
     # Set up the solution variables
     u_j = np.zeros(x.size)        # u at current time step
     u_jp1 = np.zeros(x.size)      # u at next time step
     b_jp1 = np.zeros(x.size)
+    steady_states = np.zeros(range(0,mt+1))
 
     # Set initial condition
     # u_j[0] =  u_I(x[0]) + bound_conds[0]
@@ -125,12 +130,8 @@ def pde_solver(u_I,lmbda,x,mx,mt,bound_conds, method=forward, type_bc='Dirichlet
         u_jp1 = method(u_j,u_jp1,lmbda, x, mx, b_jp1, type_bc)
 
         # Save u_j at time t[j+1]
-        if u_j[:] == u_jp1[:]:
-            t_steady = j
-            print(u_j,u_jp1)
-
+        steady_states[j] = pde_steady_states(u_j[:],u_jp1[:],j)
         u_j[:] = u_jp1[:]
 
 
-
-    return u_j,x,t_steady
+    return u_j,x,steady_state_time
