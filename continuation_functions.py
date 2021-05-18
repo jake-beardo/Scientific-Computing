@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize  import fsolve
 from solver_functions import solve_ode, solve_to, euler_step, rk4
 from shooting_functions import shooting, shoot, integrate, get_phase_conditon,period_finder
-from pde_solver_functions import pde_solver
+from pde_solver_functions import pde_solver,forward,backward,crank
 from main import func
 from matplotlib import pyplot as plt
 
@@ -44,7 +44,7 @@ def continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, 
         u2 = u_vals[0]+beta*u_vals[1]+u_vals[1]*(u_vals[0]**2 + u_vals[1]**2)-u_vals[1]*((u_vals[0]**2 + u_vals[1]**2)**2)
         return np.array([u1,u2])
     >>> continuation_natural(np.array([0.1,0.1]), 100, hopf_mod , 'beta',discretisation=shooting, param_step_size=0.1, param_from=-1,param_to=2,step_size=0.01,n=500, rk_e='--runge', beta=0.1)
-
+    [-1. -0.57714843 -0.57735543 ........ -1.50433312 -1.52137971]
     '''
     found_inits = np.array(np.array([init_guess]))
     kwargs[init_param]=param_from
@@ -58,7 +58,8 @@ def continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, 
         if discretisation==shooting:
             init_guess, period = shooting(init_guess, tt, ODE, step_size=0.01,n=500, rk_e='--runge', **kwargs)
         elif discretisation==pde_solver:
-            u_j,x,t_steady = pde_solver(u_I,lmbda,x,mx,mt,bound_conds, method=forward, type_bc='Dirichlet')
+            u_j,x,t_steady_states = pde_solver(u_I,L,T,kappa,mx,mt,bound_conds, method=forward, type_bc='Dirichlet')
+            t_steady_states[0]
         else:
             init_guess = fsolve(ODE,init_guess,args=kwargs[init_param])
         param_from += param_step_size

@@ -16,8 +16,6 @@ def hopf_mod(t, u_vals, beta):
     return np.array([u1,u2])
 # ^^ vary beta between -1 and 2
 
-
-
     # # where theta is the phase
 beta = 0.1
 tt = 100
@@ -26,7 +24,6 @@ tt = 100
 
 def func(x,c):
     return (x**3) - x + c
-
 
 
 # The discretisation case

@@ -103,18 +103,27 @@ def crank(u_j,u_jp1,lmbda,x,mx,b_jp1, type_bc):
     return u_jp1
 
 
-def pde_steady_states(u_j,u_jp1,time):
-    if np.allclose(u_j, u_jp1):
-        return time
+def pde_steady_states(u_j,u_jp1,j,t):
+    if np.allclose(u_j, u_jp1,rtol=1e-1)==True:
+        return t[j]
     else:
-        return np.nan
+        return False
 
-def pde_solver(u_I,lmbda,x,mx,mt,bound_conds, method=forward, type_bc='Dirichlet'):
+def pde_solver(u_I,L,T,kappa,mx,mt,bound_conds, method=forward, type_bc='Dirichlet'):
+    # Set up the numerical environment variables
+    x = np.linspace(0, L, mx+1)     # mesh points in space
+    t = np.linspace(0, T, mt+1)     # mesh points in time
+    deltax = x[1] - x[0]            # gridspacing in x
+    deltat = t[1] - t[0]            # gridspacing in t
+    lmbda = kappa*deltat/(deltax**2)    # mesh fourier number
+    print("deltax=",deltax)
+    print("deltat=",deltat)
+    print("lambda=",lmbda)
     # Set up the solution variables
     u_j = np.zeros(x.size)        # u at current time step
     u_jp1 = np.zeros(x.size)      # u at next time step
     b_jp1 = np.zeros(x.size)
-    steady_states = np.zeros(range(0,mt+1))
+    steady_states = []
 
     # Set initial condition
     # u_j[0] =  u_I(x[0]) + bound_conds[0]
@@ -130,8 +139,13 @@ def pde_solver(u_I,lmbda,x,mx,mt,bound_conds, method=forward, type_bc='Dirichlet
         u_jp1 = method(u_j,u_jp1,lmbda, x, mx, b_jp1, type_bc)
 
         # Save u_j at time t[j+1]
-        steady_states[j] = pde_steady_states(u_j[:],u_jp1[:],j)
+
+        steady_state = pde_steady_states(u_j,u_jp1,j,t)
+        if steady_state:
+            steady_states.append(steady_state)
+        elif not steady_state:
+            steady_states = []
+
         u_j[:] = u_jp1[:]
 
-
-    return u_j,x,steady_state_time
+    return u_j,x,steady_states
