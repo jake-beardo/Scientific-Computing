@@ -1,10 +1,10 @@
-''' test forward euler '''
-
+''' simple test for PDE continuation'''
 import numpy as np
 import pylab as pl
 from math import pi
 import matplotlib.pyplot as plt
 from pde_solver_functions import pde_solver, forward, backward, crank
+from continuation_functions import continuation_natural
 
 # Set problem parameters/functions
 kappa = 0.5   # diffusion constant
@@ -38,9 +38,9 @@ method=backward
 type_bc = 'Dirichlet'
 bound_conds = np.array([p_func,q_func])
 
-# u_I,L,T,main_param, ,mx,mt,bound_conds,varied_param=main_param, method=forward, type_bc='Dirichlet', **kwargs
-u_j,x,steady_state = pde_solver(u_I,L,T,mx,mt,bound_conds,main_param='kappa',method=method,type_bc=type_bc,kappa=kappa)
-print(steady_state)
+
+# continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, param_step_size=0.1, param_from=0,param_to=2, step_size=0.01,n=500, rk_e='--runge',bound_conds=np.array([0,0]),method=forward,type_bc='Dirichlet', **kwargs):
+print(continuation_natural(1.6, mt, u_I, 'kappa', discretisation=pde_solver, param_step_size=0.01, param_from=0.5,param_to=2,main_param='kappa',L=L,T=T,mx=mx,bound_conds=bound_conds,method=method,type_bc=type_bc, kappa=kappa))
 
 # Plot the final result and exact solution
 pl.plot(x,u_j,'ro',label='num')
@@ -49,4 +49,6 @@ pl.plot(xx,u_exact(xx,T),'b-',label='exact')
 pl.xlabel('x')
 pl.ylabel('u(x,0.5)')
 # pl.legend(loc='upper right')
-pl.show()
+# pl.show()
+
+# PDE continuation

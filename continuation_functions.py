@@ -7,7 +7,7 @@ from main import func
 from matplotlib import pyplot as plt
 
 
-def continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, param_step_size=0.1, param_from=0,param_to=2, step_size=0.01,n=500, rk_e='--runge',bound_conds=np.array([0,0]),method=forward,type_bc='Dirichlet', **kwargs):
+def continuation_natural(init_guess, tt, func, init_param, discretisation=False, param_step_size=0.1, param_from=0,param_to=2, step_size=0.01,n=500, rk_e='--runge',main_param=None,L=0,T=0,mx=0,bound_conds=np.array([0,0]),method=forward,type_bc='Dirichlet', **kwargs):
     '''
     Varies through a given parameter 'init_param' and finds the inital conditions from param_from to param_to finding all param_step_size's inbetween.
 
@@ -19,7 +19,7 @@ def continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, 
         The inital guess for the intial conditons of the function you are doing natual parameter continuation for
     tt  :  number
         The target value of t that the funtion will solve up to
-    ODE :   function
+    func :   function
         Differnetial equation or system of differnetial equations. Defined as a function.
     init_param  :   string
         The parameter chosen to do natural parameter continuation for.
@@ -54,14 +54,17 @@ def continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, 
     if not number_of_steps.is_integer() or number_of_steps < 0:
         raise Exception("number of steps in continuation must be a natural number please choose whole numbers param_from and param_to and/or a different param_step_size")
     for i in range(0,int(number_of_steps)+1):
-        # vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs
+        # vars,tt, func,step_size=0.01,n=500, rk_e='--runge', **kwargs
         if discretisation==shooting:
-            init_guess, period = shooting(init_guess, tt, ODE, step_size=0.01,n=500, rk_e='--runge', **kwargs)
+            init_guess, period = shooting(init_guess, tt, func, step_size=0.01,n=500, rk_e='--runge', **kwargs)
         elif discretisation==pde_solver:
-            u_j,x,t_steady_states = pde_solver(u_I,L,T,kappa,mx,mt,bound_conds, method=forward, type_bc='Dirichlet')
-            t_steady_states[0]
+            # pde_solver(u_I,L,T,mx,mt,bound_conds,main_param,varied_param=None, method=forward, type_bc='Dirichlet', **kwargs)
+            if not main_param:
+                raise Exception("You need to pass the main parameter you are using as a string parameter in continuation_natural (e.g. \main_param=\'kappa\'\)")
+            u_j,x,t_steady_states = pde_solver(func,L,T,mx,tt,bound_conds,main_param=main_param,varied_param=init_param, method=method, type_bc='Dirichlet',**kwargs)
+            init_guess = t_steady_states[0]
         else:
-            init_guess = fsolve(ODE,init_guess,args=kwargs[init_param])
+            init_guess = fsolve(func,init_guess,args=kwargs[init_param])
         param_from += param_step_size
         kwargs[init_param]=param_from
 

@@ -107,15 +107,19 @@ def pde_steady_states(u_j,u_jp1,j,t):
     if np.allclose(u_j, u_jp1,rtol=1e-1)==True:
         return t[j]
     else:
-        return False
+        return None
 
-def pde_solver(u_I,L,T,kappa,mx,mt,bound_conds, method=forward, type_bc='Dirichlet'):
+def pde_solver(u_I,L,T,mx,mt,bound_conds,main_param,varied_param=None, method=forward, type_bc='Dirichlet', **kwargs):
     # Set up the numerical environment variables
     x = np.linspace(0, L, mx+1)     # mesh points in space
     t = np.linspace(0, T, mt+1)     # mesh points in time
     deltax = x[1] - x[0]            # gridspacing in x
     deltat = t[1] - t[0]            # gridspacing in t
-    lmbda = kappa*deltat/(deltax**2)    # mesh fourier number
+    if not varied_param:
+        varied_param = main_param
+    main_param = kwargs[main_param]
+    varied_param = kwargs[varied_param]
+    lmbda = main_param*deltat/(deltax**2)    # mesh fourier number
     print("deltax=",deltax)
     print("deltat=",deltat)
     print("lambda=",lmbda)
@@ -144,8 +148,10 @@ def pde_solver(u_I,L,T,kappa,mx,mt,bound_conds, method=forward, type_bc='Dirichl
         if steady_state:
             steady_states.append(steady_state)
         elif not steady_state:
-            steady_states = []
 
+            steady_states = []
         u_j[:] = u_jp1[:]
 
+    if not steady_states:
+        steady_states = ['No steady states found in the range given']
     return u_j,x,steady_states
