@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from pde_solver_functions import pde_solver, forward, backward, crank
 
 # Set problem parameters/functions
-kappa = 1.0   # diffusion constant
+kappa = 0.1   # diffusion constant
 L=1.0         # length of spatial domain
 T=0.5         # total time to solve for
 def u_I(x):
@@ -39,7 +39,7 @@ print("lambda=",lmbda)
 
 # These are the boundary condition functions
 def p_func(t):
-    return np.sin(t)
+    return t
 
 def q_func(t):
     return 0
@@ -48,7 +48,7 @@ def q_func(t):
 method=backward
 method=crank
 method=crank
-type_bc = 'Neumann'
+type_bc = 'periodic'
 bound_conds = np.array([p_func,q_func])
 u_j,x = pde_solver(u_I,lmbda,x,mx,mt,bound_conds,method,type_bc)
 
@@ -58,5 +58,5 @@ xx = np.linspace(0,L,250)
 pl.plot(xx,u_exact(xx,T),'b-',label='exact')
 pl.xlabel('x')
 pl.ylabel('u(x,0.5)')
-pl.legend(loc='upper right')
+# pl.legend(loc='upper right')
 pl.show()

@@ -35,13 +35,15 @@ def forward(u_j,u_jp1,lmbda,x,mx,b_jp1, type_bc):
         A_diag[0,1] = 2*lmbda
         A_diag[-1,-2] = 2*lmbda
         u_jp1 = set_bcs(mx,lmbda,x,u_jp1,u_j,A_diag,b_jp1,type_bc,method)
+    elif type_bc == 'periodic':
+        A_diag = np.diag([1-2*lmbda]*(mx))+np.diag([lmbda]*(mx-1),-1) + np.diag([lmbda]*(mx-1),1)
+        A_diag[-1,0] = 2*lmbda
+        A_diag[0,-1] = 2*lmbda
+        u_jp1[1:mx+1] = A_diag@u_j[1:mx+1]
+        u_jp1[-1]=u_jp1[0]
 
     else:
         A_diag = np.diag([1-2*lmbda]*(mx-1))+np.diag([lmbda]*(mx-2),-1) + np.diag([lmbda]*(mx-2),1)
-        if type_bc == 'periodic':
-            A_diag[0,-1] = lmbda
-            A_diag[-1,0] = lmbda
-            b_jp1[-2] = b_jp1[1]
         u_jp1[1:mx] = A_diag@u_j[1:mx] + lmbda*b_jp1[1:mx]
         u_jp1 = set_bcs(mx,lmbda,x,u_jp1,u_j,A_diag,b_jp1,type_bc,method)
 
@@ -49,18 +51,23 @@ def forward(u_j,u_jp1,lmbda,x,mx,b_jp1, type_bc):
 
 def backward(u_j,u_jp1,lmbda,x,mx,b_jp1, type_bc):
     method=backward
+
     if type_bc == 'Neumann':
         A_diag = np.diag([1+2*lmbda]*(mx+1))+np.diag([-lmbda]*(mx),-1) + np.diag([-lmbda]*(mx),1)
         A_diag[0,1] = -2*lmbda
         A_diag[-1,-2] = -2*lmbda
         u_jp1 = set_bcs(mx,lmbda,x,u_jp1,u_j,A_diag,b_jp1,type_bc,method)
 
+    elif type_bc == 'periodic':
+        A_diag = np.diag([1+2*lmbda]*(mx))+np.diag([-lmbda]*(mx-1),-1) + np.diag([-lmbda]*(mx-1),1)
+        A_diag[-1,0] = -2*lmbda
+        A_diag[0,-1] = -2*lmbda
+        u_jp1[1:mx+1] = np.linalg.solve(A_diag, u_j[1:mx+1])
+        u_jp1[-1]=u_jp1[0]
+
     else:
         A_diag = np.diag([1+2*lmbda]*(mx-1))+np.diag([-lmbda]*(mx-2),-1) + np.diag([-lmbda]*(mx-2),1)
-        if type_bc == 'periodic':
-            A_diag[0,-1] = -lmbda
-            A_diag[-1,0] = -lmbda
-            b_jp1[-2] = b_jp1[1]
+
         u_jp1[1:mx] = np.linalg.solve(A_diag, u_j[1:mx] + lmbda*b_jp1[1:mx])
         u_jp1 = set_bcs(mx,lmbda,x,u_jp1,u_j,A_diag,b_jp1,type_bc,method)
 
@@ -70,6 +77,8 @@ def backward(u_j,u_jp1,lmbda,x,mx,b_jp1, type_bc):
 
 def crank(u_j,u_jp1,lmbda,x,mx,b_jp1, type_bc):
     method=crank
+
+
     if type_bc == 'Neumann':
         A = np.diag([1+lmbda]*(mx+1))+np.diag([-lmbda/2]*(mx),-1) + np.diag([-lmbda/2]*(mx),1)
         B = np.diag([1-lmbda]*(mx+1))+np.diag([lmbda/2]*(mx),-1) + np.diag([lmbda/2]*(mx),1)
@@ -79,17 +88,18 @@ def crank(u_j,u_jp1,lmbda,x,mx,b_jp1, type_bc):
         B[-1,-2] = 2*lmbda
         '''change set bcs to do Neumann'''
         u_jp1 = set_bcs(mx,lmbda,x,u_jp1,u_j,[A,B],b_jp1,type_bc,method)
-
+    elif type_bc == 'periodic':
+        A = np.diag([1+lmbda]*(mx))+np.diag([-lmbda/2]*(mx-1),-1) + np.diag([-lmbda/2]*(mx-1),1)
+        B = np.diag([1-lmbda]*(mx))+np.diag([lmbda/2]*(mx-1),-1) + np.diag([lmbda/2]*(mx-1),1)
+        A[-1,0] = -2*lmbda
+        A[0,-1] = -2*lmbda
+        B[-1,0] = 2*lmbda
+        B[0,-1] = 2*lmbda
+        u_jp1[1:mx+1] = np.linalg.solve(A, ((B @ u_j[1:mx+1])))
+        u_jp1[-1] = u_jp1[0]
     else:
         A = np.diag([1+lmbda]*(mx-1))+np.diag([-lmbda/2]*(mx-2),-1) + np.diag([-lmbda/2]*(mx-2),1)
         B = np.diag([1-lmbda]*(mx-1))+np.diag([lmbda/2]*(mx-2),-1) + np.diag([lmbda/2]*(mx-2),1)
-        if type_bc == 'periodic':
-            A[0,-1] = -lmbda
-            A[-1,0] = -lmbda
-            B[0,-1] = lmbda
-            B[-1,0] = lmbda
-            b_jp1[-2] = b_jp1[1]
-
         u_jp1[1:mx] = np.linalg.solve(A, ((B @ u_j[1:mx]) + lmbda*b_jp1[1:mx]))
         u_jp1 = set_bcs(mx,lmbda,x,u_jp1,u_j,[A,B],b_jp1,type_bc,method)
     return u_jp1
