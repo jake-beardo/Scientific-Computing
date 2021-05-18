@@ -41,12 +41,10 @@ def forward(u_j,u_jp1,lmbda,x,mx,b_jp1, type_bc):
         A_diag[0,-1] = 2*lmbda
         u_jp1[1:mx+1] = A_diag@u_j[1:mx+1]
         u_jp1[-1]=u_jp1[0]
-
     else:
         A_diag = np.diag([1-2*lmbda]*(mx-1))+np.diag([lmbda]*(mx-2),-1) + np.diag([lmbda]*(mx-2),1)
         u_jp1[1:mx] = A_diag@u_j[1:mx] + lmbda*b_jp1[1:mx]
         u_jp1 = set_bcs(mx,lmbda,x,u_jp1,u_j,A_diag,b_jp1,type_bc,method)
-
     return u_jp1
 
 def backward(u_j,u_jp1,lmbda,x,mx,b_jp1, type_bc):
@@ -127,6 +125,12 @@ def pde_solver(u_I,lmbda,x,mx,mt,bound_conds, method=forward, type_bc='Dirichlet
         u_jp1 = method(u_j,u_jp1,lmbda, x, mx, b_jp1, type_bc)
 
         # Save u_j at time t[j+1]
+        if u_j[:] == u_jp1[:]:
+            t_steady = j
+            print(u_j,u_jp1)
+
         u_j[:] = u_jp1[:]
 
-    return u_j,x
+
+
+    return u_j,x,t_steady
