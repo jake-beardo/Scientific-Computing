@@ -31,24 +31,21 @@ def p_func(t):
 def q_func(t):
     return 4
 
-
 method=backward
 method=crank
-method=backward
+method=crank
 type_bc = 'Dirichlet'
 bound_conds = np.array([p_func,q_func])
 
-
 # continuation_natural(init_guess, tt, ODE, init_param, discretisation=False, param_step_size=0.1, param_from=0,param_to=2, step_size=0.01,n=500, rk_e='--runge',bound_conds=np.array([0,0]),method=forward,type_bc='Dirichlet', **kwargs):
-print(continuation_natural(1.6, mt, u_I, 'kappa', discretisation=pde_solver, param_step_size=0.01, param_from=0.5,param_to=2,main_param='kappa',L=L,T=T,mx=mx,bound_conds=bound_conds,method=method,type_bc=type_bc, kappa=kappa))
+steady_states,params = continuation_natural(1.6, mt, u_I, 'kappa', discretisation=pde_solver, param_step_size=0.05, param_from=0.5,param_to=2,main_param='kappa',L=L,T=T,mx=mx,bound_conds=bound_conds,method=method,type_bc=type_bc, kappa=kappa)
 
 # Plot the final result and exact solution
-pl.plot(x,u_j,'ro',label='num')
-xx = np.linspace(0,L,250)
-pl.plot(xx,u_exact(xx,T),'b-',label='exact')
+pl.plot(steady_states,params,'r-',label='num')
+
 pl.xlabel('x')
 pl.ylabel('u(x,0.5)')
 # pl.legend(loc='upper right')
-# pl.show()
+pl.show()
 
 # PDE continuation
