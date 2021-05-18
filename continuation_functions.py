@@ -6,6 +6,10 @@ from pde_solver_functions import pde_solver,forward,backward,crank
 from main import func
 from matplotlib import pyplot as plt
 
+def append_inits_params(found_inits,init_guess,params_from,param_from):
+    found_inits = np.append(found_inits, init_guess)
+    params_from = np.append(params_from, param_from)
+    return found_inits, param_from
 
 def continuation_natural(init_guess, tt, func, init_param, discretisation=False, param_step_size=0.1, param_from=0,param_to=2, step_size=0.05,n=500, rk_e='--runge',main_param=None,L=0,T=0,mx=0,bound_conds=np.array([0,0]),method=forward,type_bc='Dirichlet', **kwargs):
     '''
@@ -46,10 +50,10 @@ def continuation_natural(init_guess, tt, func, init_param, discretisation=False,
     >>> continuation_natural(np.array([0.1,0.1]), 100, hopf_mod , 'beta',discretisation=shooting, param_step_size=0.1, param_from=-1,param_to=2,step_size=0.01,n=500, rk_e='--runge', beta=0.1)
     [-1. -0.57714843 -0.57735543 ........ -1.50433312 -1.52137971]
     '''
-    found_inits = np.array(np.array([init_guess]))
-
-    kwargs[init_param]=param_from
+    found_inits = np.array(np.array([]))
     params_from = np.array([])
+    kwargs[init_param]=param_from
+
     #  it simply increments the a parameter by a set amount and attempts to find
     #  the solution for the new parameter value using the last found solution as an initial guess.
     number_of_steps = ((param_to-param_from)/param_step_size)
@@ -59,24 +63,22 @@ def continuation_natural(init_guess, tt, func, init_param, discretisation=False,
         # vars,tt, func,step_size=0.01,n=500, rk_e='--runge', **kwargs
         if discretisation==shooting:
             init_guess, period = shooting(init_guess, tt, func, step_size=0.01,n=500, rk_e='--runge', **kwargs)
-            found_inits = np.append(found_inits, init_guess)
-            params_from = np.append(params_from, param_from)
+            found_inits,params_from = append_inits_params(found_inits,init_guess,params_from,param_from)
+
         elif discretisation==pde_solver:
             # pde_solver(u_I,L,T,mx,mt,bound_conds,main_param,varied_param=None, method=forward, type_bc='Dirichlet', **kwargs)
             if not main_param:
                 raise Exception("You need to pass the main parameter you are using as a string parameter in continuation_natural (e.g. main_param=\'kappa\')")
             u_j,x,t_steady_states = pde_solver(func,L,T,mx,tt,bound_conds,main_param=main_param,varied_param=init_param, method=method, type_bc='Dirichlet',**kwargs)
-            if type(t_steady_states[0]) != str
+            if type(t_steady_states[0]) != str:
                 init_guess = t_steady_states[0]
-                found_inits = np.append(found_inits, init_guess)
-                params_from = np.append(params_from, param_from)
+                found_inits,params_from = append_inits_params(found_inits,init_guess,params_from,param_from)
 
         else:
             init_guess = fsolve(func,init_guess,args=kwargs[init_param])
-            found_inits = np.append(found_inits, init_guess)
-            params_from = np.append(params_from, param_from)
+            found_inits,params_from = append_inits_params(found_inits,init_guess,params_from,param_from)
+
         param_from += param_step_size
         kwargs[init_param]=param_from
 
-
-    return found_inits,params_from
+    return found_inits, params_from
