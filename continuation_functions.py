@@ -83,3 +83,30 @@ def continuation_natural(init_guess, tt, func, init_param, discretisation=False,
         kwargs[init_param]=param_from
 
     return found_inits, params_from
+
+
+
+def pseudo_arc_length_continuation(init_guess, func,n):
+    np.vars_array([])
+    for var in init_guess:
+        vars_array = np.append(vars_array,var)
+
+    var0,var1 = vars_array
+
+    secant = var1 - var0 # Creating secant
+    v_tilda = var1 + secant
+    for i in range(n):
+        def rooting_obj_fun(v):
+            b = v[0]
+            U = v[1:]
+            f = func(U,b)
+            dot_prod = np.dot((v-v_tilda),secant)
+            return np.append(dot_prod,f)
+
+        solution = fsolve(objective,v_tilda)
+        v_true = solution
+        vars_array.append(v_true)
+        secant = vars_array[-1]-vars_array[-2]
+        v_tilda = vars_array[-1] + secant
+    final_var = np.array(vars_array)
+    return final_var.transpose()
