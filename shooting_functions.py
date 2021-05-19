@@ -1,13 +1,11 @@
 import numpy as np
 from scipy.optimize  import fsolve
-from scipy.integrate import solve_ivp
-from solver_functions import solve_ode, solve_to, euler_step, rk4
+import solver_functions
 from main import func
 from matplotlib import pyplot as plt
 import warnings
 
-
-def shooting(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
+def shooting(vars,tt, ODE,step_size=0.01, rk_e='--runge', param_idx=0,period_guess=None,**kwargs):
     '''
     Uses numerical shooting and root finder (fsolve) to find the initial conditons and period of a funciton.
 
@@ -26,10 +24,6 @@ def shooting(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     step_size : number
         This is the size of the 'step' the euler funtion will approximate using e.g it will return the approimation for value(s) of the funtion at
         t_pre + step_size.
-    n : number
-        The number of steps you want to take between the inital value and target
-        value. The more steps (i.e. higher n) the better the approimation will
-        be. n is set to 500 by defult.
     rk_e : string
         String '--euler' chooses to compute step using euler method. Otherwise
         will use 4th order Runge-Kutta method.
@@ -51,6 +45,7 @@ def shooting(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     >>> shooting(np.array([0.1,0.1]),200, lokta, 0.1,500, '--runge', a=1,b=0.2, d=0.1)
     [0.10603874 0.18419065] 20.775315952158223
     '''
+
     try:
         ODE(tt,vars,**kwargs)
     except IndexError:
@@ -58,13 +53,18 @@ def shooting(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge', **kwargs):
     if np.shape(vars) != np.shape(ODE(tt,vars,**kwargs)):
         raise Exception('The dimensions provided from the intial guess given are larger than the dimensions required for the ODE. Please try a different inital guess with smaller dimensions')
     # using solve_ode to approximate solution for ode using inital guesses
-    t_vals, sols = solve_ode(vars,tt, ODE, **kwargs)
-    period_guess = period_finder(t_vals, sols) # finding good guess for period of ode
+    t_vals, sols = solver_functions.solve_ode(vars,tt, ODE, **kwargs)
+    print('ts and sols',t_vals,sols)
+    if period_guess == None:
+        period_guess = period_finder(t_vals, sols) # finding good guess for period of ode
+        if period_guess != float:
+            raise Exception('Please input a guess for the period as a parameter in shooting (period_guess=SomeGuess)')
+    print('ss',period_guess)
     inital_guesses = np.append(vars,period_guess)
+    print('init', inital_guesses)
     warnings.filterwarnings('error')
     try:
-        # rooting finding using the shooting method
-        sol = fsolve(lambda sols, ODE: shoot(tt, sols, ODE, **kwargs), inital_guesses, ODE)
+        sol = fsolve(lambda sols,ODE: shoot(sols, ODE, param_idx,rk_e, **kwargs), inital_guesses,ODE)
     except RuntimeWarning:
         raise Exception('The root finder is not able to converge. Please try a different intial condition guesses or different guess for the periodic orbit')
     # plt.plot(t_vals, sols[:,0])
@@ -129,20 +129,22 @@ def hopf(t, u_vals, beta, sigma):
     u1 = beta*u_vals[0]-u_vals[1]+sigma*u_vals[0]*(u_vals[0]**2 + u_vals[1]**2)
     u2 = u_vals[0]+beta*u_vals[1]+sigma*u_vals[1]*(u_vals[0]**2 + u_vals[1]**2)
     return np.array([u1,u2])
-def integrate(vars, tt, ODE, **kwargs):
+def integrate(vars, tt, ODE,rk_e, **kwargs):
     '''
     Uses solve_ode to find the differnce in final solution values at tt for ode and the intial solutions at t0
 
     Parameters
     ----------
-    vars : numpy array or number
+    vars    : numpy array or number
         The value(s) or approximations of the function at either the intial guess
         or previous step taken.
-    tt  :  number
+    tt      :  number
         The target value of t that the funtion will integrate for.
-    ODE :  function
+    ODE     :  function
         Differnetial equation or system of differnetial equations. Defined as a
         function.
+    rk_e    :  string
+        The choice of either runge-kutta method ('--runge') or euler method ('--euler')
     **kwargs : variables
         This may include any additional variables that may be used in the system
         of ODE's.
@@ -160,11 +162,12 @@ def integrate(vars, tt, ODE, **kwargs):
     >>> integrate(vars, tt, ODE)
     [1.21813282 1.21813282]
     '''
+    # solve_ode(vars,tt, ODE,step_size=0.01,n=500, rk_e='--runge'
 
-    t_values, sols = solve_ode(vars,tt, ODE, **kwargs)
-    return sols[-1, :] - vars
+    t_values, sols = solver_functions.solve_ode(vars,tt, ODE,rk_e=rk_e, **kwargs)
+    return vars - sols[-1]
 
-def get_phase_conditon(ODE, vars, **kwargs):
+def get_phase_conditon(ODE, vars,param_idx, **kwargs):
     '''
     Finds the phase condition of a function i.e. when f'(x) = 0
 
@@ -183,7 +186,7 @@ def get_phase_conditon(ODE, vars, **kwargs):
     Returns
     -------
     np.array([ODE(0, vars,**kwargs)[0]]) : numpy array
-        The phasecondition when the ode is equal to zero.
+        The phase-condition when the ode is equal to zero.
 
     Examples
     --------
@@ -193,12 +196,10 @@ def get_phase_conditon(ODE, vars, **kwargs):
     >>> get_phase_conditon(ODE, vars)
     [0.09983342]
     '''
-
-    return np.array([ODE(0, vars,**kwargs)[0]])
-
+    return np.array([ODE(0, vars,**kwargs)[param_idx]])
 
 
-def shoot(tt,sols, ODE, **kwargs):
+def shoot(guess, ODE, param_idx,rk_e, **kwargs):
     '''
     Uses the get_phase_conditon and integrate function to find the better inital guesses for variables and period od the system of ODEs
 
@@ -230,9 +231,9 @@ def shoot(tt,sols, ODE, **kwargs):
     [0.35865757 9.99999983]
     '''
 
-    vars = sols[:-1]
-    tt = sols[-1]
-    vars_and_period = np.concatenate((integrate(vars, tt, ODE, **kwargs), get_phase_conditon(ODE, vars, **kwargs)))
+    vars = guess[:-1]
+    tt = guess[-1]
+    vars_and_period = np.concatenate((integrate(vars, tt, ODE,rk_e, **kwargs), get_phase_conditon(ODE, vars,param_idx, **kwargs)))
     return vars_and_period
 
 def func1(t_pre,vars):

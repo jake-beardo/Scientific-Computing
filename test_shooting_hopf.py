@@ -2,6 +2,8 @@
 import numpy as np
 from shooting_functions import *
 
+import solver_functions
+
 def hopf(t, u_vals, beta, sigma):
     u1 = beta*u_vals[0]-u_vals[1]+sigma*u_vals[0]*(u_vals[0]**2 + u_vals[1]**2)
     u2 = u_vals[0]+beta*u_vals[1]+sigma*u_vals[1]*(u_vals[0]**2 + u_vals[1]**2)
@@ -13,7 +15,7 @@ beta = 0.1
 tt = 100
 
 us, period = shooting(np.array([1,1]),tt, hopf, 0.01, 'z', beta=beta, sigma=-1)
-t_vals, sols = solve_ode(us,tt, hopf, beta=beta, sigma=-1)
+t_vals, sols = solver_functions.solve_ode(us,tt, hopf, beta=beta, sigma=-1)
 plt.plot(t_vals, sols[:,0])
 plt.plot(t_vals, sols[:,1])
 plt.xlabel("t")

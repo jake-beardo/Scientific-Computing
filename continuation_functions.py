@@ -11,7 +11,7 @@ def append_inits_params(found_inits,init_guess,params_from,param_from):
     params_from = np.append(params_from, param_from)
     return found_inits, params_from
 
-def continuation_natural(init_guess, tt, func, init_param, discretisation=False, param_step_size=0.1, param_from=0,param_to=2, step_size=0.05,n=500, rk_e='--runge',main_param=None,L=0,T=0,mx=0,bound_conds=np.array([0,0]),method=forward,type_bc='Dirichlet', **kwargs):
+def continuation_natural(init_guess, tt, func, init_param, discretisation=False, param_step_size=0.1, param_from=0,param_to=2, step_size=0.05,n=500, rk_e='--runge',main_param=None,L=0,T=0,mx=0,bound_conds=np.array([0,0]),method=forward,type_bc='Dirichlet',period_guess=None, **kwargs):
     '''
     Varies through a given parameter 'init_param' and finds the inital conditions from param_from to param_to finding all param_step_size's inbetween.
 
@@ -62,7 +62,8 @@ def continuation_natural(init_guess, tt, func, init_param, discretisation=False,
     for i in range(0,int(number_of_steps)+1):
         # vars,tt, func,step_size=0.01,n=500, rk_e='--runge', **kwargs
         if discretisation==shooting:
-            init_guess, period = shooting(init_guess, tt, func, step_size=0.01,n=500, rk_e='--runge', **kwargs)
+            init_guess, period_guess = shooting(init_guess, tt, func, step_size, rk_e,period_guess=period_guess, **kwargs)
+
             found_inits,params_from = append_inits_params(found_inits,init_guess,params_from,param_from)
 
         elif discretisation==pde_solver:
