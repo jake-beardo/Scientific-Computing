@@ -86,26 +86,26 @@ def continuation_natural(init_guess, tt, func, init_param, discretisation=False,
 
 
 
-def pseudo_arc_length_continuation(init_guess, func,n):
-    np.vars_array([])
-    for var in init_guess:
-        vars_array = np.append(vars_array,var)
-
+def pseudo_arc_length_continuation(init_guess, func,n,**kwargs):
     var0,var1 = vars_array
 
     secant = var1 - var0 # Creating secant
     v_tilda = var1 + secant
+    print(v_tilda)
     for i in range(n):
-        def rooting_obj_fun(v):
+        def rooting_obj_fun(v,**kwargs):
             b = v[0]
             U = v[1:]
-            f = func(U,b)
+            print(v)
+            f = func(0,v,**kwargs)
             dot_prod = np.dot((v-v_tilda),secant)
             return np.append(dot_prod,f)
 
-        solution = fsolve(objective,v_tilda)
+        # fsolve(lambda sols,ODE: shoot(sols, ODE, param_idx,rk_e, **kwargs), inital_guesses,ODE)
+
+        solution = fsolve(lambda v_tilda1: rooting_obj_fun(v_tilda1,**kwargs),v_tilda)
         v_true = solution
-        vars_array.append(v_true)
+        np.append(vars_array,v_true)
         secant = vars_array[-1]-vars_array[-2]
         v_tilda = vars_array[-1] + secant
     final_var = np.array(vars_array)
