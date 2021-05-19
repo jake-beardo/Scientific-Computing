@@ -138,7 +138,7 @@ def pde_solver(u_I,L,T,mx,mt,bound_conds,main_param,varied_param=None, method=fo
 
     # Solve the PDE: loop over all time points
     for j in range(0, mt):
-        b_jp1[1] = bound_conds[0](j)
+        b_jp1[1] = bound_conds[0](j,varied_param)
         b_jp1[-2] = bound_conds[-1](j)
         u_jp1 = method(u_j,u_jp1,lmbda, x, mx, b_jp1, type_bc)
 

@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 def append_inits_params(found_inits,init_guess,params_from,param_from):
     found_inits = np.append(found_inits, init_guess)
     params_from = np.append(params_from, param_from)
-    return found_inits, param_from
+    return found_inits, params_from
 
 def continuation_natural(init_guess, tt, func, init_param, discretisation=False, param_step_size=0.1, param_from=0,param_to=2, step_size=0.05,n=500, rk_e='--runge',main_param=None,L=0,T=0,mx=0,bound_conds=np.array([0,0]),method=forward,type_bc='Dirichlet', **kwargs):
     '''
