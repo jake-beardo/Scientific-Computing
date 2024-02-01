@@ -1,0 +1,55 @@
+/* travel.css */
+.travel-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+
+body.expanded {
+    overflow: hidden; /* Hide the scrollbar when expanded */
+}
+
+.card {
+    margin: 10px;
+    padding: 10px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 500px; /* Set maximum width for the cards */
+}
+
+.card img {
+    max-width: 100%; /* Make sure the image stays within the card */
+    height: auto;
+}
+
+.card.expanded {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: 80%; /* Adjust the width as needed */
+    max-width: 800px; /* Set a maximum width for the expanded card */
+    height: 80vh; /* Adjust the height as needed */
+    max-height: 600px; /* Set a maximum height for the expanded card */
+    background-color: white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.card.expanded img {
+    max-width: 100%; /* Ensure the image fits within the expanded card */
+    max-height: 80%;
+}
+
+.card.expanded p {
+    margin-top: 20px;
+}
+/* Additional styling for better consistency */
+p {
+    margin-top: 10px;
+}

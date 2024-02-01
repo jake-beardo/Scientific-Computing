@@ -1,0 +1,15 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "description": "Jake Beard's Portfolio",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server src",
+    "build": "mkdir -p dist && cp -R src/* dist/"
+  },
+  "keywords": [],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+  }
+}
